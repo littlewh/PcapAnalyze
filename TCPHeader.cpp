@@ -3,10 +3,15 @@
 //
 
 #include "TCPHeader.h"
+#include "Utilities.h"
+
+/*
+ * 获取TCP包头
+ */
 bool TCPHeader::GetTCPHeader(char *url,uint64_t offset,uint64_t &used_offset){
     FILE *fp = fopen(url,"rb");
     if (fp == NULL){
-        printf("获取IPHeader时打开文件失败");
+        printf("获取TCPHeader时打开文件失败");
         return false;
     }
     else {
@@ -19,45 +24,29 @@ bool TCPHeader::GetTCPHeader(char *url,uint64_t offset,uint64_t &used_offset){
     }
 }
 
+/*
+ * 分析TCP包头
+ */
 void TCPHeader::AnalyzeTCPHeader() {
     printf("Source Port:");
-    int source_port = 0;
-    for (int i = 0;i < 2;i++){
-        source_port <<= 8;
-        source_port += 48+tcpHeader->SourcePort[i]-'0';
-        printf("%02x",tcpHeader->SourcePort[i]);
-    }
+    Utilities utilities;
+    int source_port = utilities.DisplayArray(2,tcpHeader->SourcePort);
     printf("(%d)",source_port);
     printf("\n");
 
     printf("Destination Port:");
-    int destination_port = 0;
-    for (int i = 0;i < 2;i++){
-        destination_port <<= 8;
-        destination_port += 48+tcpHeader->DestinationPort[i]-'0';
-        printf("%02x",tcpHeader->DestinationPort[i]);
-    }
+    destination_port = utilities.DisplayArray(2,tcpHeader->DestinationPort);
     printf("(%d)",destination_port);
     printf("\n");
 
     printf("Sequence Number:");
-    unsigned int sequence_number = 0;
-    for (int i = 0;i < 4;i++){
-        sequence_number <<= 8;
-        sequence_number += 48+tcpHeader->SequenceNumber[i]-'0';
-        printf("%02x",tcpHeader->SequenceNumber[i]);
-    }
-    printf("(%u)",sequence_number);
+    long long sequence_number = utilities.DisplayArray(4,tcpHeader->SequenceNumber);
+    printf("(%lld)",sequence_number);
     printf("\n");
 
     printf("Acknowledgment Number:");
-    unsigned int acknowledgment_number = 0;
-    for (int i = 0;i < 4;i++){
-        acknowledgment_number <<= 8;
-        acknowledgment_number += 48+tcpHeader->AcknowledgmentNumber[i]-'0';
-        printf("%02x",tcpHeader->AcknowledgmentNumber[i]);
-    }
-    printf("(%u)",acknowledgment_number);
+    long long acknowledgment_number = utilities.DisplayArray(4,tcpHeader->AcknowledgmentNumber);
+    printf("(%lld)",acknowledgment_number);
     printf("\n");
 
     printf("Header Length:");
@@ -77,24 +66,15 @@ void TCPHeader::AnalyzeTCPHeader() {
 //    printf("%d\n",tcp_flags);
 
     printf("Window:");
-    int window = 0;
-    for (int i = 0;i < 2;i++){
-        window <<= 8;
-        window += 48+tcpHeader->Window[i]-'0';
-        printf("%02x",tcpHeader->Window[i]);
-    }
-    printf("(%d)",window);
+    long long window = utilities.DisplayArray(2,tcpHeader->Window);;
+    printf("(%lld)",window);
     printf("\n");
 
     printf("Checksum:");
-    for (int i = 0;i < 2;i++){
-        printf("%02x",tcpHeader->CheckSum[i]);
-    }
+    utilities.DisplayArray(2,tcpHeader->CheckSum);
     printf("\n");
 
     printf("Urgent Pointer:");
-    for (int i = 0;i < 2;i++){
-        printf("%02x",tcpHeader->UrgentPointer[i]);
-    }
+    utilities.DisplayArray(2,tcpHeader->UrgentPointer);
     printf("\n");
 }

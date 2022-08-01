@@ -5,6 +5,7 @@
 #include "PacketHeader.h"
 #include <iostream>
 #include <cstdint>
+#include "Utilities.h"
 
 bool PacketHeader::GetPacketHeader(char *url,uint64_t offset) {
     FILE *fp = fopen(url,"rb");
@@ -31,29 +32,22 @@ long long PacketHeader::AnalyzePacketHeader(bool pcapFlag) {
     long long TimestampLow = 0;
     long long CapLen = 0;
     long long Len = 0;
+    Utilities utilities;
 
     printf("TimestampHigh:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",packetHeader->char_timestamp_high[i]);
-    }
+    utilities.DisplayArray(4,packetHeader->char_timestamp_high);
     printf("\n");
 
     printf("TimestampLow:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",packetHeader->char_timestamp_low[i]);
-    }
+    utilities.DisplayArray(4,packetHeader->char_timestamp_low);
     printf("\n");
 
     printf("Caplen:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",packetHeader->char_caplen[i]);
-    }
+    utilities.DisplayArray(4,packetHeader->char_caplen);
     printf("\n");
 
     printf("Len:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",packetHeader->char_len[i]);
-    }
+    utilities.DisplayArray(4,packetHeader->char_len);
     printf("\n");
 
     if (pcapFlag == true){//Ð¡¶Ë

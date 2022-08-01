@@ -17,7 +17,7 @@ struct ipv6_header{
     uint8_t NextHeader;//下一报头
     uint8_t HopLimit;//生存时间
     uint8_t SourceAddress[16];//源地址
-    uint16_t DestinationAddress[16];//目的地址
+    uint8_t DestinationAddress[16];//目的地址
 };
 class IPv6Header {
 public:

@@ -6,36 +6,37 @@
 #define PCAPANALYZE_ICMPHEADER_H
 #include <cstdint>
 #include <map>
-/* å…±8ä¸ªå­—èŠ‚ */
+/* ¹²8¸ö×Ö½Ú */
 
 struct icmp_header{
-    uint8_t Type;//ç±»å‹
-    uint8_t Code;//ä»£ç 
-    uint8_t CheckSum[2];//æ ¡éªŒå’Œ
-    uint8_t Identifier[2];//æ ‡è¯†ç¬¦
-    uint8_t SequenceNumber[2];//åºåˆ—å·
+    uint8_t Type;//ÀàĞÍ
+    uint8_t Code;//´úÂë
+    uint8_t CheckSum[2];//Ğ£ÑéºÍ
+    uint8_t Identifier[2];//±êÊ¶·û
+    uint8_t SequenceNumber[2];//ĞòÁĞºÅ
 };
 class ICMPHeader {
 public:
     ICMPHeader(){
+        errorFlag = false;
         icmpHeader = new icmp_header();
-        map_type[0] = "åº”ç­”";
-        map_type[3] = "ç»ˆç‚¹ä¸å¯è¾¾";
-        map_type[5] = "é‡å®šå‘";
-        map_type[11] = "æ—¶é—´è¶…è¿‡";
-        map_type[12] = "å‚æ•°é—®é¢˜";
-        map_type[0] = "å›é€å›ç­”";
-        map_type[8] = "å›é€è¯·æ±‚";
-        map_type[13] = "æ—¶é—´æˆ³è¯·æ±‚";
-        map_type[14] = "æ—¶é—´æˆ³å›ç­”";
+        map_type[0] = "Ó¦´ğ";
+        map_type[3] = "ÖÕµã²»¿É´ï";
+        map_type[5] = "ÖØ¶¨Ïò";
+        map_type[8] = "»ØËÍÇëÇó";
+        map_type[11] = "Ê±¼ä³¬¹ı";
+        map_type[12] = "²ÎÊıÎÊÌâ";
+        map_type[13] = "Ê±¼ä´ÁÇëÇó";
+        map_type[14] = "Ê±¼ä´Á»Ø´ğ";
 
-        map_code[0] = "å›æ˜¾";
-        map_code[1] = "ä¸»æœº";
-        map_code[2] = "åè®®";
-        map_code[3] = "ç«¯å£";
+        map_code[0] = "»ØÏÔ";
+        map_code[1] = "Ö÷»ú";
+        map_code[2] = "Ğ­Òé";
+        map_code[3] = "¶Ë¿Ú";
     }
-    bool GetICMPHeader(char *url,uint64_t offset,uint64_t &used_offset);//è·å–Headeræ•°æ®
+    bool GetICMPHeader(char *url,uint64_t offset,uint64_t &used_offset);//»ñÈ¡HeaderÊı¾İ
     void AnalyzeICMPHeader();
+    bool errorFlag;
 private:
     icmp_header *icmpHeader;
     std::map<int,std::string> map_type;

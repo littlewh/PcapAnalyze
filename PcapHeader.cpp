@@ -6,6 +6,7 @@
 #include <fstream>
 #include <cstdio>
 #include "PcapHeader.h"
+#include "Utilities.h"
 
 bool PcapHeader::GetPcapHeader(char *url,uint64_t offset) {
     FILE *fp = fopen(url,"rb");
@@ -23,54 +24,38 @@ bool PcapHeader::GetPcapHeader(char *url,uint64_t offset) {
 }
 
 bool PcapHeader::AnalyzePcapHeader() {
-    long long magic = 0;
     long long SnapLenNumber = 0;
     long MajorNumber = 0;
     long MinorNumber = 0;
     LinkTypeFlag = 0;
+    Utilities utilities;
 
     printf("Magic:");
-    for(int i = 0;i < 4;i++){
-        magic <<= 8;
-        magic += 48+pcapHeader->char_magic[i]-'0';
-        printf("%02x",pcapHeader->char_magic[i]);
-    }
+    long long magic = utilities.DisplayArray(4,pcapHeader->char_magic);
     printf("\n");
 
     printf("Major:");
-    for(int i = 0;i < 2;i++){
-        printf("%02x",pcapHeader->char_major[i]);
-    }
+    utilities.DisplayArray(2,pcapHeader->char_major);
     printf("\n");
 
     printf("Minor:");
-    for(int i = 0;i < 2;i++){
-        printf("%02x",pcapHeader->char_minor[i]);
-    }
+    utilities.DisplayArray(2,pcapHeader->char_minor);
     printf("\n");
 
     printf("ThisZone:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",pcapHeader->char_thiszone[i]);
-    }
+    utilities.DisplayArray(4,pcapHeader->char_thiszone);
     printf("\n");
 
     printf("SigFigs:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",pcapHeader->char_sigfigs[i]);
-    }
+    utilities.DisplayArray(4,pcapHeader->char_sigfigs);
     printf("\n");
 
     printf("SnapLen:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",pcapHeader->char_snap_len[i]);
-    }
+    utilities.DisplayArray(4,pcapHeader->char_snap_len);
     printf("\n");
 
     printf("LinkType:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",pcapHeader->char_linktype[i]);
-    }
+    utilities.DisplayArray(4,pcapHeader->char_linktype);
     printf("\n");
 
     if (magic == 3569595041){

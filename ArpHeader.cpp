@@ -3,6 +3,8 @@
 //
 
 #include "ArpHeader.h"
+#include "Utilities.h"
+
 bool ArpHeader::GetArpHeader(char *url, uint64_t offset, uint64_t &used_offset) {
     FILE *fp = fopen(url,"rb");
     if (fp == NULL){
@@ -20,37 +22,27 @@ bool ArpHeader::GetArpHeader(char *url, uint64_t offset, uint64_t &used_offset) 
 }
 
 void ArpHeader::AnalyzeArpHeader() {
+    Utilities utilities;
+
     printf("Hardware Type:");
-    for(int i = 0;i < 2;i++){
-        printf("%02x",arpHeader->HardwareType[i]);
-    }
+    utilities.DisplayArray(2,arpHeader->HardwareType);
     printf("\n");
 
     printf("Protocol Type:");
-    protocol_type = 0;
-    for(int i = 0;i < 2;i++){
-        protocol_type <<= 8;
-        protocol_type += 48+arpHeader->ProtocolType[i]-'0';
-        printf("%02x",arpHeader->ProtocolType[i]);
-    }
+    protocol_type = utilities.DisplayArray(2,arpHeader->ProtocolType);
     std::cout<<"("<<map_protocol[protocol_type]<<")";
     printf("\n");
 
     printf("Hardware Size:");
-    printf("%02x(%d)",arpHeader->HardwareSize,48+arpHeader->HardwareSize-'0');
+    printf("%(%d)",utilities.DisplayElement(arpHeader->HardwareSize));
     printf("\n");
 
     printf("Protocol Size:");
-    printf("%02x(%d)",arpHeader->ProtocolSize,48+arpHeader->ProtocolSize-'0');
+    printf("%(%d)",utilities.DisplayElement(arpHeader->ProtocolSize));
     printf("\n");
 
     printf("OpCode:");
-    int op_code = 0;
-    for(int i = 0;i < 2;i++){
-        op_code <<= 8;
-        op_code += 48+arpHeader->OpCode[i]-'0';
-        printf("%02x",arpHeader->OpCode[i]);
-    }
+    int op_code = utilities.DisplayArray(2,arpHeader->OpCode);
     std::cout<<"("<<map_opcode[op_code]<<")";
     printf("\n");
 
@@ -64,9 +56,7 @@ void ArpHeader::AnalyzeArpHeader() {
     printf("\n");
 
     printf("SenderIPAddress:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",arpHeader->SenderIPAddress[i]);
-    }
+    utilities.DisplayArray(4,arpHeader->SenderIPAddress);
     printf("(");
     for(int i = 0;i < 4;i++){
         printf("%d",48+arpHeader->SenderIPAddress[i]-'0');
@@ -87,9 +77,7 @@ void ArpHeader::AnalyzeArpHeader() {
     printf("\n");
 
     printf("TargetIPAddress:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",arpHeader->TargetIPAddress[i]);
-    }
+    utilities.DisplayArray(4,arpHeader->TargetIPAddress);
     printf("(");
     for(int i = 0;i < 4;i++){
         printf("%d",48+arpHeader->TargetIPAddress[i]-'0');

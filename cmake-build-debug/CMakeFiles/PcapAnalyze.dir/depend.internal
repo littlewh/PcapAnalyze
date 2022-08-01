@@ -4,29 +4,49 @@
 CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.obj
  E:/TestProject/PcapAnalyze/ArpHeader.cpp
  E:/TestProject/PcapAnalyze/ArpHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
+CMakeFiles/PcapAnalyze.dir/Data.cpp.obj
+ E:/TestProject/PcapAnalyze/Data.cpp
+ E:/TestProject/PcapAnalyze/Data.h
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/ICMPHeader.cpp.obj
  E:/TestProject/PcapAnalyze/ICMPHeader.cpp
  E:/TestProject/PcapAnalyze/ICMPHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/IPv4Header.cpp.obj
  E:/TestProject/PcapAnalyze/IPv4Header.cpp
  E:/TestProject/PcapAnalyze/IPv4Header.h
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/IPv6Header.cpp.obj
  E:/TestProject/PcapAnalyze/IPv6Header.cpp
  E:/TestProject/PcapAnalyze/IPv6Header.h
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/MacHeader.cpp.obj
  E:/TestProject/PcapAnalyze/MacHeader.cpp
  E:/TestProject/PcapAnalyze/MacHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/PacketHeader.cpp.obj
  E:/TestProject/PcapAnalyze/PacketHeader.cpp
  E:/TestProject/PcapAnalyze/PacketHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/PcapHeader.cpp.obj
  E:/TestProject/PcapAnalyze/PcapHeader.cpp
  E:/TestProject/PcapAnalyze/PcapHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/TCPHeader.cpp.obj
  E:/TestProject/PcapAnalyze/TCPHeader.cpp
  E:/TestProject/PcapAnalyze/TCPHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
+CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.obj
+ E:/TestProject/PcapAnalyze/UDPHeader.cpp
+ E:/TestProject/PcapAnalyze/UDPHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
+CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj
+ E:/TestProject/PcapAnalyze/Utilities.cpp
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj
  E:/TestProject/PcapAnalyze/ArpHeader.h
+ E:/TestProject/PcapAnalyze/Data.h
  E:/TestProject/PcapAnalyze/ICMPHeader.h
  E:/TestProject/PcapAnalyze/IPv4Header.h
  E:/TestProject/PcapAnalyze/IPv6Header.h
@@ -34,4 +54,5 @@ CMakeFiles/PcapAnalyze.dir/main.cpp.obj
  E:/TestProject/PcapAnalyze/PacketHeader.h
  E:/TestProject/PcapAnalyze/PcapHeader.h
  E:/TestProject/PcapAnalyze/TCPHeader.h
+ E:/TestProject/PcapAnalyze/UDPHeader.h
  E:/TestProject/PcapAnalyze/main.cpp

@@ -3,6 +3,7 @@
 //
 
 #include "IPv4Header.h"
+#include "Utilities.h"
 
 bool IPv4Header::GetIPHeader(char *url,uint64_t offset,uint64_t &used_offset){
     FILE *fp = fopen(url,"rb");
@@ -21,6 +22,8 @@ bool IPv4Header::GetIPHeader(char *url,uint64_t offset,uint64_t &used_offset){
 }
 
 void::IPv4Header::AnalyzeIPHeader(){
+    Utilities utilities;
+
     printf("Version:");
     printf("%01x",ipv4Header->VersionAndIHL/16);
     printf("\n");
@@ -34,51 +37,34 @@ void::IPv4Header::AnalyzeIPHeader(){
     printf("\n");
 
     printf("Total Length:");
-    int total_length = 0;
-    for(int i = 0;i < 2;i++){
-        total_length <<= 8;
-        total_length += 48+ipv4Header->TotalLength[i]-'0';
-        printf("%02x",ipv4Header->TotalLength[i]);
-    }
-    printf("(%d)",total_length);
+    long long total_length = utilities.DisplayArray(2,ipv4Header->TotalLength);
+    printf("(%lld)",total_length);
     printf("\n");
 
     printf("Identification:");
-    int identification = 0;
-    for(int i = 0;i < 2;i++){
-        identification <<= 8;
-        identification += 48+ipv4Header->Identification[i]-'0';
-        printf("%02x",ipv4Header->Identification[i]);
-    }
-    printf("(%d)",identification);
+    long long identification = utilities.DisplayArray(2,ipv4Header->Identification);
+    printf("(%lld)",identification);
     printf("\n");
 
     printf("Flags and FragementOffset:");
-    for(int i = 0;i < 2;i++){
-        printf("%02x",ipv4Header->FlagsAndFragementOffset[i]);
-    }
+    utilities.DisplayArray(2,ipv4Header->FlagsAndFragementOffset);
     printf("\n");
 
     printf("Time to Live:");
-    printf("%02x (%d)",ipv4Header->TimeToLive,48+ipv4Header->TimeToLive-'0');
+    printf("(%d)",utilities.DisplayElement(ipv4Header->TimeToLive));
     printf("\n");
 
     printf("Protocol:");
-    printf("%02x ",ipv4Header->Protocol);
-    ipProtocolType = ipv4Header->Protocol;
+    ipProtocolType = utilities.DisplayElement(ipv4Header->Protocol);
     std::cout<<"("<<map_protocol[ipProtocolType]<<")";
     printf("\n");
 
     printf("Header Checksum:");
-    for(int i = 0;i < 2;i++){
-        printf("%02x",ipv4Header->HeaderChecksum[i]);
-    }
+    utilities.DisplayArray(2,ipv4Header->HeaderChecksum);
     printf("\n");
 
     printf("Source Address:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",ipv4Header->SourceAddress[i]);
-    }
+    utilities.DisplayArray(4,ipv4Header->SourceAddress);
     printf("(");//转为十进制的ip形式
     for(int i = 0;i < 4;i++){
         printf("%d",48+ipv4Header->SourceAddress[i]-'0');
@@ -90,9 +76,7 @@ void::IPv4Header::AnalyzeIPHeader(){
     printf("\n");
 
     printf("Destination Address:");
-    for(int i = 0;i < 4;i++){
-        printf("%02x",ipv4Header->DestinationAddress[i]);
-    }
+    utilities.DisplayArray(4,ipv4Header->DestinationAddress);
     printf("(");//转为十进制的ip形式
     for(int i = 0;i < 4;i++){
         printf("%d",48+ipv4Header->DestinationAddress[i]-'0');

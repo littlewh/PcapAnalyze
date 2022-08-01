@@ -192,6 +192,45 @@ CMakeFiles/PcapAnalyze.dir/ICMPHeader.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PcapAnalyze.dir/ICMPHeader.cpp.s"
 	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\TestProject\PcapAnalyze\ICMPHeader.cpp -o CMakeFiles\PcapAnalyze.dir\ICMPHeader.cpp.s
 
+CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj: CMakeFiles/PcapAnalyze.dir/flags.make
+CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj: ../Utilities.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=E:\TestProject\PcapAnalyze\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\PcapAnalyze.dir\Utilities.cpp.obj -c E:\TestProject\PcapAnalyze\Utilities.cpp
+
+CMakeFiles/PcapAnalyze.dir/Utilities.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PcapAnalyze.dir/Utilities.cpp.i"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E E:\TestProject\PcapAnalyze\Utilities.cpp > CMakeFiles\PcapAnalyze.dir\Utilities.cpp.i
+
+CMakeFiles/PcapAnalyze.dir/Utilities.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PcapAnalyze.dir/Utilities.cpp.s"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\TestProject\PcapAnalyze\Utilities.cpp -o CMakeFiles\PcapAnalyze.dir\Utilities.cpp.s
+
+CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.obj: CMakeFiles/PcapAnalyze.dir/flags.make
+CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.obj: ../UDPHeader.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=E:\TestProject\PcapAnalyze\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.obj"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\PcapAnalyze.dir\UDPHeader.cpp.obj -c E:\TestProject\PcapAnalyze\UDPHeader.cpp
+
+CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.i"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E E:\TestProject\PcapAnalyze\UDPHeader.cpp > CMakeFiles\PcapAnalyze.dir\UDPHeader.cpp.i
+
+CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.s"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\TestProject\PcapAnalyze\UDPHeader.cpp -o CMakeFiles\PcapAnalyze.dir\UDPHeader.cpp.s
+
+CMakeFiles/PcapAnalyze.dir/Data.cpp.obj: CMakeFiles/PcapAnalyze.dir/flags.make
+CMakeFiles/PcapAnalyze.dir/Data.cpp.obj: ../Data.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=E:\TestProject\PcapAnalyze\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/PcapAnalyze.dir/Data.cpp.obj"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\PcapAnalyze.dir\Data.cpp.obj -c E:\TestProject\PcapAnalyze\Data.cpp
+
+CMakeFiles/PcapAnalyze.dir/Data.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PcapAnalyze.dir/Data.cpp.i"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E E:\TestProject\PcapAnalyze\Data.cpp > CMakeFiles\PcapAnalyze.dir\Data.cpp.i
+
+CMakeFiles/PcapAnalyze.dir/Data.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PcapAnalyze.dir/Data.cpp.s"
+	"D:\x86_64-8.1.0-release-posix-sjlj-rt_v6-rev0 (1)\mingw64\bin\g++.exe" $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S E:\TestProject\PcapAnalyze\Data.cpp -o CMakeFiles\PcapAnalyze.dir\Data.cpp.s
+
 # Object files for target PcapAnalyze
 PcapAnalyze_OBJECTS = \
 "CMakeFiles/PcapAnalyze.dir/main.cpp.obj" \
@@ -202,7 +241,10 @@ PcapAnalyze_OBJECTS = \
 "CMakeFiles/PcapAnalyze.dir/TCPHeader.cpp.obj" \
 "CMakeFiles/PcapAnalyze.dir/IPv6Header.cpp.obj" \
 "CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.obj" \
-"CMakeFiles/PcapAnalyze.dir/ICMPHeader.cpp.obj"
+"CMakeFiles/PcapAnalyze.dir/ICMPHeader.cpp.obj" \
+"CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj" \
+"CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.obj" \
+"CMakeFiles/PcapAnalyze.dir/Data.cpp.obj"
 
 # External object files for target PcapAnalyze
 PcapAnalyze_EXTERNAL_OBJECTS =
@@ -216,11 +258,14 @@ PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/TCPHeader.cpp.obj
 PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/IPv6Header.cpp.obj
 PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.obj
 PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/ICMPHeader.cpp.obj
+PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj
+PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/UDPHeader.cpp.obj
+PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/Data.cpp.obj
 PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/build.make
 PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/linklibs.rsp
 PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/objects1.rsp
 PcapAnalyze.exe: CMakeFiles/PcapAnalyze.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=E:\TestProject\PcapAnalyze\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable PcapAnalyze.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=E:\TestProject\PcapAnalyze\cmake-build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable PcapAnalyze.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\PcapAnalyze.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

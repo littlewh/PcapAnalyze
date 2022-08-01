@@ -27,9 +27,11 @@ public:
     bool GetTCPHeader(char *url,uint64_t offset,uint64_t &used_offset);//获取Header数据
     void AnalyzeTCPHeader();
     int tcp_flags;
+    int destination_port;
 private:
     tcp_header *tcpHeader;
 };
 
 
-#endif //PCAPANALYZE_TCPHEADER_H
+#endif //PCAPANALYZE_TCPHEADER_
+// H

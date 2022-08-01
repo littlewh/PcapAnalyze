@@ -9,6 +9,8 @@
 #include "TCPHeader.h"
 #include "ArpHeader.h"
 #include "ICMPHeader.h"
+#include "UDPHeader.h"
+#include "Data.h"
 
 class PcapFile{
 public:
@@ -60,12 +62,14 @@ private:
     TCPHeader tcpHeader;
     ArpHeader arpHeader;
     ICMPHeader icmpHeader;
+    UDPHeader udpHeader;
+    Data httpData;
 
     std::ifstream pcap_file;
     bool pcapFlag;//判断大小端
     char *url;//文件路径
     uint64_t offset;//偏移量，为了fseek的定位
-    long long CapLen;
+    uint64_t CapLen;
 
     void inputPcapHeader();
     bool inputPackHeader();
@@ -75,6 +79,9 @@ private:
     void inputIPv6Header(uint64_t &used_offset);
     void inputArpHeader(uint64_t &used_offset);
     void inputICMPHeader(uint64_t &used_offset);
+    void inputUDPHeader(uint64_t &used_offset);
+    void inputData(uint64_t &used_offset,int caplen);
+
 };
 
 void PcapFile::inputPcapHeader() {
@@ -117,13 +124,6 @@ void PcapFile::inputMacHeader(uint64_t &used_offset) {
     }
 }
 
-void PcapFile::inputTCPHeader(uint64_t &used_offset) {
-//    std::cout<<offset<<std::endl;
-    std::cout<<"*****TCP Header*****\n";
-    tcpHeader.GetTCPHeader(url,offset,used_offset);
-    tcpHeader.AnalyzeTCPHeader();
-}
-
 void PcapFile::inputIPv4Header(uint64_t &used_offset) {
 //    std::cout<<offset<<std::endl;
     std::cout<<"*****IPv4 Header*****\n";
@@ -135,6 +135,9 @@ void PcapFile::inputIPv4Header(uint64_t &used_offset) {
     }
     else if (ipv4Header.ipProtocolType == 1){
         inputICMPHeader(used_offset);
+    }
+    else if(ipv4Header.ipProtocolType == 17){
+        inputUDPHeader(used_offset);
     }
 }
 
@@ -151,20 +154,58 @@ void PcapFile::inputIPv6Header(uint64_t &used_offset) {
     else if(ipv6Header.nextHeader == 1){
         inputICMPHeader(used_offset);
     }
+    else if(ipv6Header.nextHeader == 17){
+        inputUDPHeader(used_offset);
+    }
 }
 
 void PcapFile::inputArpHeader(uint64_t &used_offset) {
     std::cout<<"*****Arp Header*****\n";
-
     arpHeader.GetArpHeader(url,offset,used_offset);
     arpHeader.AnalyzeArpHeader();
-
 }
 
 void PcapFile::inputICMPHeader(uint64_t &used_offset) {
     std::cout<<"*****ICMP Header*****\n";
     icmpHeader.GetICMPHeader(url,offset,used_offset);
     icmpHeader.AnalyzeICMPHeader();
+    if(icmpHeader.errorFlag == true){//差错报文包含下层ip报
+        if(macHeader.MacTypeflag == 0x800){
+            inputIPv4Header(used_offset);
+        }
+        else if(macHeader.MacTypeflag == 0x86DD){
+            inputIPv6Header(used_offset);
+        }
+    }
+}
+
+void PcapFile::inputTCPHeader(uint64_t &used_offset) {
+//    std::cout<<offset<<std::endl;
+    std::cout<<"*****TCP Header*****\n";
+    tcpHeader.GetTCPHeader(url,offset,used_offset);
+    tcpHeader.AnalyzeTCPHeader();
+
+    if(tcpHeader.tcp_flags == 0x18 && tcpHeader.destination_port == 80){//PSH,ACK  80端口httpget请求
+        inputData(used_offset,CapLen);
+    }
+}
+
+void PcapFile::inputUDPHeader(uint64_t &used_offset) {
+    std::cout<<"*****UDP Header*****\n";
+    udpHeader.GetTCPHeader(url,offset,used_offset);
+    udpHeader.AnalyzeTCPHeader();
+
+    if(udpHeader.destination_port == 53){//DNS协议
+        inputData(used_offset,CapLen);
+    }
+    else if (udpHeader.destination_port == 1900) {//SSDP协议
+        inputData(used_offset,CapLen);
+    }
+}
+
+void PcapFile::inputData(uint64_t &used_offset, int caplen) {
+    std::cout<<"*****Data GET*****\n";
+    httpData.GetHttpData(url,offset,used_offset,caplen);
 }
 
 int main() {

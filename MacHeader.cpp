@@ -4,6 +4,8 @@
 
 #include <iostream>
 #include "MacHeader.h"
+#include "Utilities.h"
+
 bool::MacHeader::GetMacHeader(char *url,uint64_t offset,uint64_t &used_offset){
     FILE *fp = fopen(url,"rb");
     if (fp == NULL){
@@ -21,6 +23,8 @@ bool::MacHeader::GetMacHeader(char *url,uint64_t offset,uint64_t &used_offset){
 }
 
 void::MacHeader::AnalyzeMacHeader(){
+    Utilities utilities;
+
     printf("Destination:");
     for (int i = 0;i < 6;i++){
         printf("%02x",macHeader->DesTinationMacAddress[i]);
@@ -39,13 +43,9 @@ void::MacHeader::AnalyzeMacHeader(){
     }
     printf("\n");
 
-    MacTypeflag = 0;
+
     printf("Type:");
-    for (int i = 0;i < 2;i++){
-        printf("%02x",macHeader->MacType[i]);
-        MacTypeflag <<= 8;
-        MacTypeflag += 48 + macHeader->MacType[i] -'0';
-    }
+    MacTypeflag = utilities.DisplayArray(2,macHeader->MacType);
 //    std::cout<<type<<std::endl;
 
     std::cout<<"("<<map_type[MacTypeflag]<<")"<<std::endl;

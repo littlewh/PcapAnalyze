@@ -3,6 +3,7 @@
 //
 
 #include "IPv6Header.h"
+#include "Utilities.h"
 
 bool IPv6Header::GetIPHeader(char *url, uint64_t offset, uint64_t &used_offset) {
     FILE *fp = fopen(url,"rb");
@@ -21,6 +22,8 @@ bool IPv6Header::GetIPHeader(char *url, uint64_t offset, uint64_t &used_offset) 
 }
 
 void IPv6Header::AnalyzeIPHeader() {
+    Utilities utilities;
+
     printf("Version:");
     printf("%01x",ipv6Header->VersionAndTrafiicHigh/16);
     printf("\n");
@@ -31,41 +34,29 @@ void IPv6Header::AnalyzeIPHeader() {
 
     printf("FlowLabel:");
     printf("%01x",ipv6Header->TrafiicLowAndFlowHigh%16);
-    for (int i = 0;i < 2;i++){
-        printf("%02x",ipv6Header->FlowLable[i]);
-    }
+    utilities.DisplayArray(2,ipv6Header->FlowLable);
     printf("\n");
 
     printf("PayLoad Length:");
-    int payload_length = 0;
-    for (int i = 0;i < 2;i++){
-        payload_length <<= 8;
-        payload_length += 48+ipv6Header->PayloadLength[i]-'0';
-        printf("%02x",ipv6Header->PayloadLength[i]);
-    }
-    printf("(%d)",payload_length);
+    long long payload_length = utilities.DisplayArray(2,ipv6Header->PayloadLength);
+    printf("(%lld)",payload_length);
     printf("\n");
 
     printf("Next Header:");
-    nextHeader = 48+ipv6Header->NextHeader-'0';
-    printf("%02x",ipv6Header->NextHeader);
+    nextHeader = utilities.DisplayElement(ipv6Header->NextHeader);
     std::cout<<"("<<map_nextheader[nextHeader]<<")";
     printf("\n");
 
     printf("Hop Limit:");
-    printf("%02x(%d)",ipv6Header->HopLimit,48+ipv6Header->HopLimit-'0');
+    printf("(%d)",utilities.DisplayElement(ipv6Header->HopLimit));
     printf("\n");
 
     printf("Source Address:");
-    for (int i = 0;i < 4;i++){
-        printf("%02x",ipv6Header->SourceAddress[i]);
-    }
+    utilities.DisplayArray(16,ipv6Header->SourceAddress);
     printf("\n");
 
     printf("Destination Address:");
-    for (int i = 0;i < 4;i++){
-        printf("%02x",ipv6Header->DestinationAddress[i]);
-    }
+    utilities.DisplayArray(16,ipv6Header->DestinationAddress);
     printf("\n");
 
 }

@@ -86,6 +86,12 @@
 		<Unit filename="E:/TestProject/PcapAnalyze/ArpHeader.h">
 			<Option target="PcapAnalyze"/>
 		</Unit>
+		<Unit filename="E:/TestProject/PcapAnalyze/Data.cpp">
+			<Option target="PcapAnalyze"/>
+		</Unit>
+		<Unit filename="E:/TestProject/PcapAnalyze/Data.h">
+			<Option target="PcapAnalyze"/>
+		</Unit>
 		<Unit filename="E:/TestProject/PcapAnalyze/ICMPHeader.cpp">
 			<Option target="PcapAnalyze"/>
 		</Unit>
@@ -126,6 +132,18 @@
 			<Option target="PcapAnalyze"/>
 		</Unit>
 		<Unit filename="E:/TestProject/PcapAnalyze/TCPHeader.h">
+			<Option target="PcapAnalyze"/>
+		</Unit>
+		<Unit filename="E:/TestProject/PcapAnalyze/UDPHeader.cpp">
+			<Option target="PcapAnalyze"/>
+		</Unit>
+		<Unit filename="E:/TestProject/PcapAnalyze/UDPHeader.h">
+			<Option target="PcapAnalyze"/>
+		</Unit>
+		<Unit filename="E:/TestProject/PcapAnalyze/Utilities.cpp">
+			<Option target="PcapAnalyze"/>
+		</Unit>
+		<Unit filename="E:/TestProject/PcapAnalyze/Utilities.h">
 			<Option target="PcapAnalyze"/>
 		</Unit>
 		<Unit filename="E:/TestProject/PcapAnalyze/main.cpp">
