@@ -62,8 +62,7 @@ uint64_t Utilities::Find_KMP(char *data_string, char *target_string) {
     }
     t1=0;
     t2=0;
-    while(t1 < data_len) //临界值
-    {
+    while(t1 < data_len){//临界值
         if(t2 == -1 || data_string[t1] == target_string[t2]){//匹配成功，继续
             t1++;
             t2++;
@@ -76,4 +75,36 @@ uint64_t Utilities::Find_KMP(char *data_string, char *target_string) {
             return t1-tar_len+1;
         }
     }
+}
+
+/*
+ * 抽象出的输入函数
+ */
+bool Utilities::inputHeader(char *url, uint64_t offset, uint64_t &used_offset, uint64_t len, void *object) {
+    FILE *fp = fopen(url,"rb");
+    if (fp == NULL){
+        printf("打开文件失败");
+        return false;
+    }
+    else {
+        offset += used_offset;//加上偏移
+        fseek(fp,offset,SEEK_SET);
+        fread(object,len,1,fp);
+        used_offset += len;
+        fclose(fp);
+        return true;
+    }
+}
+
+/*
+ * 在报文中分理出字段
+ */
+std::string Utilities::findItemInData(std::string item_start,std::string item_end,std::string data) {
+    std::string::size_type pos_start = data.find(item_start);
+    if(pos_start != data.npos){
+        std::string::size_type pos_end = data.find(item_end,pos_start+1);
+        return data.substr(pos_start,pos_end-pos_start);
+    }
+
+    return "";
 }

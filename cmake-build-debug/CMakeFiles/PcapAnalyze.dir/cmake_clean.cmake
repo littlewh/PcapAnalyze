@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.obj"
+  "CMakeFiles/PcapAnalyze.dir/DNSHeader.cpp.obj"
   "CMakeFiles/PcapAnalyze.dir/Data.cpp.obj"
   "CMakeFiles/PcapAnalyze.dir/ICMPHeader.cpp.obj"
   "CMakeFiles/PcapAnalyze.dir/IPv4Header.cpp.obj"

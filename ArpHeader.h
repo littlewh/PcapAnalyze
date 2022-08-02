@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include "Utilities.h"
+
 /* 共28字节 */
 
 struct arp_header{
@@ -40,6 +42,7 @@ private:
     arp_header *arpHeader;
     std::map<int,std::string> map_protocol;
     std::map<int,std::string> map_opcode;
+    Utilities utilities;
 };
 
 

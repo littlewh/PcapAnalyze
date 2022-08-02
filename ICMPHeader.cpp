@@ -5,32 +5,17 @@
 #include <cstdio>
 #include <iostream>
 #include "ICMPHeader.h"
-#include "Utilities.h"
 
 /*
  * 获取icmp报文头
  */
 bool ICMPHeader::GetICMPHeader(char *url, uint64_t offset, uint64_t &used_offset) {
-    FILE *fp = fopen(url,"rb");
-    if (fp == NULL){
-        printf("获取ICMPHeader时打开文件失败");
-        return false;
-    }
-    else {
-        offset += used_offset;//加上Mac IP偏移
-        fseek(fp,offset,SEEK_SET);
-        fread(icmpHeader,8,1,fp);
-        used_offset += 8;
-        fclose(fp);
-        return true;
-    }
+    return utilities.inputHeader(url,offset,used_offset,8,icmpHeader);
 }
 /*
  * 分析icmp报文头
  */
 void ICMPHeader::AnalyzeICMPHeader() {
-    Utilities utilities;
-
     printf("Type:");
     int icmp_type = utilities.DisplayElement(icmpHeader->Type);
     std::cout<<"("<<map_type[icmp_type]<<")";

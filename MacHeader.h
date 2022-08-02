@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <fstream>
 #include <map>
+#include "Utilities.h"
+
 /*共14字节*/
 
 struct mac_header{
@@ -31,6 +33,7 @@ public:
 private:
     mac_header *macHeader;
     std::map<long,std::string> map_type;
+    Utilities utilities;
 };
 
 

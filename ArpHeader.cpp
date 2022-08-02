@@ -3,26 +3,19 @@
 //
 
 #include "ArpHeader.h"
-#include "Utilities.h"
 
+/*
+ * 获取Arp包头
+ */
 bool ArpHeader::GetArpHeader(char *url, uint64_t offset, uint64_t &used_offset) {
-    FILE *fp = fopen(url,"rb");
-    if (fp == NULL){
-        printf("获取ArpHeader时打开文件失败");
-        return false;
-    }
-    else {
-        offset += used_offset;//加上Mac偏移
-        fseek(fp,offset,SEEK_SET);
-        fread(arpHeader,28,1,fp);
-        used_offset += 28;
-        fclose(fp);
-        return true;
-    }
+    return utilities.inputHeader(url,offset,used_offset,28,arpHeader);
 }
 
+/*
+ * 分析Arp包头
+ */
+
 void ArpHeader::AnalyzeArpHeader() {
-    Utilities utilities;
 
     printf("Hardware Type:");
     utilities.DisplayArray(2,arpHeader->HardwareType);

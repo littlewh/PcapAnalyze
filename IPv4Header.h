@@ -8,6 +8,8 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include "Utilities.h"
+
 /*共20字节*/
 
 struct ipv4_header{
@@ -36,12 +38,12 @@ public:
     }
     bool GetIPHeader(char *url,uint64_t offset,uint64_t &used_offset);//获取Header数据
     // IP解析头
-    void AnalyzeIPHeader();
+    void AnalyzeIPHeader(uint64_t &used_offset,uint64_t &ipTotalLen);
     int ipProtocolType;
 private:
     ipv4_header *ipv4Header;
     std::map<uint8_t ,std::string> map_protocol;
-
+    Utilities utilities;
 };
 
 

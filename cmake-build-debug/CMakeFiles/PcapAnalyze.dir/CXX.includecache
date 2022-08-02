@@ -13,16 +13,28 @@ iostream
 -
 map
 -
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
+
+E:/TestProject/PcapAnalyze/DNSHeader.h
+cstdint
+-
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
 
 E:/TestProject/PcapAnalyze/Data.h
 iostream
 -
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
 
 E:/TestProject/PcapAnalyze/ICMPHeader.h
 cstdint
 -
 map
 -
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
 
 E:/TestProject/PcapAnalyze/IPv4Header.h
 cstdint
@@ -31,6 +43,8 @@ iostream
 -
 map
 -
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
 
 E:/TestProject/PcapAnalyze/IPv6Header.h
 cstdint
@@ -39,6 +53,8 @@ iostream
 -
 map
 -
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
 
 E:/TestProject/PcapAnalyze/MacHeader.h
 cstdint
@@ -47,6 +63,8 @@ fstream
 -
 map
 -
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
 
 E:/TestProject/PcapAnalyze/PacketHeader.h
 fstream
@@ -75,9 +93,19 @@ iostream
 -
 map
 -
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
 
 E:/TestProject/PcapAnalyze/UDPHeader.h
 cstdint
+-
+Utilities.h
+E:/TestProject/PcapAnalyze/Utilities.h
+
+E:/TestProject/PcapAnalyze/Utilities.h
+cstdint
+-
+map
 -
 
 E:/TestProject/PcapAnalyze/main.cpp
@@ -107,4 +135,6 @@ UDPHeader.h
 E:/TestProject/PcapAnalyze/UDPHeader.h
 Data.h
 E:/TestProject/PcapAnalyze/Data.h
+DNSHeader.h
+E:/TestProject/PcapAnalyze/DNSHeader.h
 

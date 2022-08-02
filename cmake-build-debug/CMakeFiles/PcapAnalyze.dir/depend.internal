@@ -5,6 +5,10 @@ CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.obj
  E:/TestProject/PcapAnalyze/ArpHeader.cpp
  E:/TestProject/PcapAnalyze/ArpHeader.h
  E:/TestProject/PcapAnalyze/Utilities.h
+CMakeFiles/PcapAnalyze.dir/DNSHeader.cpp.obj
+ E:/TestProject/PcapAnalyze/DNSHeader.cpp
+ E:/TestProject/PcapAnalyze/DNSHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/Data.cpp.obj
  E:/TestProject/PcapAnalyze/Data.cpp
  E:/TestProject/PcapAnalyze/Data.h
@@ -46,6 +50,7 @@ CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj
  E:/TestProject/PcapAnalyze/Utilities.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj
  E:/TestProject/PcapAnalyze/ArpHeader.h
+ E:/TestProject/PcapAnalyze/DNSHeader.h
  E:/TestProject/PcapAnalyze/Data.h
  E:/TestProject/PcapAnalyze/ICMPHeader.h
  E:/TestProject/PcapAnalyze/IPv4Header.h
@@ -55,4 +60,5 @@ CMakeFiles/PcapAnalyze.dir/main.cpp.obj
  E:/TestProject/PcapAnalyze/PcapHeader.h
  E:/TestProject/PcapAnalyze/TCPHeader.h
  E:/TestProject/PcapAnalyze/UDPHeader.h
+ E:/TestProject/PcapAnalyze/Utilities.h
  E:/TestProject/PcapAnalyze/main.cpp

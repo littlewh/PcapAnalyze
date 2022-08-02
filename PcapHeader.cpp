@@ -7,7 +7,9 @@
 #include <cstdio>
 #include "PcapHeader.h"
 #include "Utilities.h"
-
+/*
+ * 获取Pcap包头
+ */
 bool PcapHeader::GetPcapHeader(char *url,uint64_t offset) {
     FILE *fp = fopen(url,"rb");
     if (fp == NULL){
@@ -17,12 +19,13 @@ bool PcapHeader::GetPcapHeader(char *url,uint64_t offset) {
     else {
         fseek(fp,offset,SEEK_SET);
         fread(pcapHeader,24,1,fp);
-        offset += 24;
         fclose(fp);
         return true;
     }
 }
-
+/*
+ * 分析Pcap包头
+ */
 bool PcapHeader::AnalyzePcapHeader() {
     long long SnapLenNumber = 0;
     long MajorNumber = 0;

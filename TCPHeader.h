@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include "Utilities.h"
+
 /*共20个字节*/
 
 struct tcp_header{
@@ -25,11 +27,13 @@ public:
         tcpHeader = new tcp_header();
     }
     bool GetTCPHeader(char *url,uint64_t offset,uint64_t &used_offset);//获取Header数据
-    void AnalyzeTCPHeader();
+    void AnalyzeTCPHeader(uint64_t &used_offset,uint64_t &payload);
     int tcp_flags;
     int destination_port;
+    int source_port;
 private:
     tcp_header *tcpHeader;
+    Utilities utilities;
 };
 
 

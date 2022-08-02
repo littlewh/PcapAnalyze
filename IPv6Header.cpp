@@ -3,27 +3,19 @@
 //
 
 #include "IPv6Header.h"
-#include "Utilities.h"
+
+/*
+ * 获取IPv6包头
+ */
 
 bool IPv6Header::GetIPHeader(char *url, uint64_t offset, uint64_t &used_offset) {
-    FILE *fp = fopen(url,"rb");
-    if (fp == NULL){
-        printf("获取IPHeader时打开文件失败");
-        return false;
-    }
-    else {
-        offset += used_offset;//加上Mac偏移
-        fseek(fp,offset,SEEK_SET);
-        fread(ipv6Header,40,1,fp);
-        used_offset += 40;
-        fclose(fp);
-        return true;
-    }
+    return utilities.inputHeader(url,offset,used_offset,40,ipv6Header);
 }
 
-void IPv6Header::AnalyzeIPHeader() {
-    Utilities utilities;
-
+/*
+ * 分析IPv6包头
+ */
+void IPv6Header::AnalyzeIPHeader(uint64_t &ipTotalLen) {
     printf("Version:");
     printf("%01x",ipv6Header->VersionAndTrafiicHigh/16);
     printf("\n");
@@ -39,6 +31,7 @@ void IPv6Header::AnalyzeIPHeader() {
 
     printf("PayLoad Length:");
     long long payload_length = utilities.DisplayArray(2,ipv6Header->PayloadLength);
+    ipTotalLen = payload_length;
     printf("(%lld)",payload_length);
     printf("\n");
 

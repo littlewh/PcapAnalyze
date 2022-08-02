@@ -13,7 +13,8 @@ public:
     int DisplayElement(uint8_t element);
     void BackSpace(int number);
     uint64_t Find_KMP(char data_string[],char target_string[]);
-
+    bool inputHeader(char *url, uint64_t offset, uint64_t &used_offset,uint64_t len,void *object);
+    std::string findItemInData(std::string item_start,std::string item_end,std::string data);
 private:
     void KMP_getnext(uint64_t tar_len,uint64_t data_len,int next[]);
     void KMP();

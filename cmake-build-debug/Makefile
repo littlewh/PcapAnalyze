@@ -168,6 +168,33 @@ ArpHeader.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\PcapAnalyze.dir\build.make CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.s
 .PHONY : ArpHeader.cpp.s
 
+DNSHeader.obj: DNSHeader.cpp.obj
+
+.PHONY : DNSHeader.obj
+
+# target to build an object file
+DNSHeader.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PcapAnalyze.dir\build.make CMakeFiles/PcapAnalyze.dir/DNSHeader.cpp.obj
+.PHONY : DNSHeader.cpp.obj
+
+DNSHeader.i: DNSHeader.cpp.i
+
+.PHONY : DNSHeader.i
+
+# target to preprocess a source file
+DNSHeader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PcapAnalyze.dir\build.make CMakeFiles/PcapAnalyze.dir/DNSHeader.cpp.i
+.PHONY : DNSHeader.cpp.i
+
+DNSHeader.s: DNSHeader.cpp.s
+
+.PHONY : DNSHeader.s
+
+# target to generate assembly for a file
+DNSHeader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\PcapAnalyze.dir\build.make CMakeFiles/PcapAnalyze.dir/DNSHeader.cpp.s
+.PHONY : DNSHeader.cpp.s
+
 Data.obj: Data.cpp.obj
 
 .PHONY : Data.obj
@@ -477,6 +504,9 @@ help:
 	@echo ... ArpHeader.obj
 	@echo ... ArpHeader.i
 	@echo ... ArpHeader.s
+	@echo ... DNSHeader.obj
+	@echo ... DNSHeader.i
+	@echo ... DNSHeader.s
 	@echo ... Data.obj
 	@echo ... Data.i
 	@echo ... Data.s

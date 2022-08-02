@@ -3,33 +3,28 @@
 //
 
 #include "IPv4Header.h"
-#include "Utilities.h"
 
+/*
+ * 获取IPv4包头
+ */
 bool IPv4Header::GetIPHeader(char *url,uint64_t offset,uint64_t &used_offset){
-    FILE *fp = fopen(url,"rb");
-    if (fp == NULL){
-        printf("获取IPHeader时打开文件失败");
-        return false;
-    }
-    else {
-        offset += used_offset;//加上Mac偏移
-        fseek(fp,offset,SEEK_SET);
-        fread(ipv4Header,20,1,fp);
-        used_offset += 20;
-        fclose(fp);
-        return true;
-    }
+    return utilities.inputHeader(url,offset,used_offset,20,ipv4Header);
 }
-
-void::IPv4Header::AnalyzeIPHeader(){
-    Utilities utilities;
-
+/*
+ * 分析IPv4包头
+ */
+void::IPv4Header::AnalyzeIPHeader(uint64_t &used_offset,uint64_t &ipTotalLen){
     printf("Version:");
     printf("%01x",ipv4Header->VersionAndIHL/16);
     printf("\n");
 
-    printf("IHL:");
+    printf("HeaderLength:");
     printf("%01x",ipv4Header->VersionAndIHL%16);
+    int32_t header_len = 4*(48+ipv4Header->VersionAndIHL%16-'0');
+    printf("(%d bytes)",header_len);
+    if(header_len > 20){
+        used_offset += header_len - 20;
+    }
     printf("\n");
 
     printf("Type of Service:");
@@ -38,6 +33,7 @@ void::IPv4Header::AnalyzeIPHeader(){
 
     printf("Total Length:");
     long long total_length = utilities.DisplayArray(2,ipv4Header->TotalLength);
+    ipTotalLen = total_length-header_len;//求出负载长度
     printf("(%lld)",total_length);
     printf("\n");
 

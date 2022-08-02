@@ -6,7 +6,9 @@
 #include <iostream>
 #include <cstdint>
 #include "Utilities.h"
-
+/*
+ * 获取Packet包头
+ */
 bool PacketHeader::GetPacketHeader(char *url,uint64_t offset) {
     FILE *fp = fopen(url,"rb");
     if (fp == NULL){
@@ -26,7 +28,9 @@ bool PacketHeader::GetPacketHeader(char *url,uint64_t offset) {
     }
 
 }
-
+/*
+ * 分析Packet包头
+ */
 long long PacketHeader::AnalyzePacketHeader(bool pcapFlag) {
     long long TimestampHigh = 0;
     long long TimestampLow = 0;

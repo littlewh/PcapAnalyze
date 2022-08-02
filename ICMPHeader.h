@@ -6,6 +6,8 @@
 #define PCAPANALYZE_ICMPHEADER_H
 #include <cstdint>
 #include <map>
+#include "Utilities.h"
+
 /* ¹²8¸ö×Ö½Ú */
 
 struct icmp_header{
@@ -41,6 +43,7 @@ private:
     icmp_header *icmpHeader;
     std::map<int,std::string> map_type;
     std::map<int,std::string> map_code;
+    Utilities utilities;
 };
 
 

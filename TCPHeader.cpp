@@ -3,34 +3,20 @@
 //
 
 #include "TCPHeader.h"
-#include "Utilities.h"
 
 /*
  * 获取TCP包头
  */
 bool TCPHeader::GetTCPHeader(char *url,uint64_t offset,uint64_t &used_offset){
-    FILE *fp = fopen(url,"rb");
-    if (fp == NULL){
-        printf("获取TCPHeader时打开文件失败");
-        return false;
-    }
-    else {
-        offset += used_offset;//加上Mac偏移 和 IP偏移
-        fseek(fp,offset,SEEK_SET);
-        fread(tcpHeader,20,1,fp);
-        used_offset += 20;
-        fclose(fp);
-        return true;
-    }
+    return utilities.inputHeader(url,offset,used_offset,20,tcpHeader);
 }
 
 /*
  * 分析TCP包头
  */
-void TCPHeader::AnalyzeTCPHeader() {
+void TCPHeader::AnalyzeTCPHeader(uint64_t &used_offset,uint64_t &payload) {
     printf("Source Port:");
-    Utilities utilities;
-    int source_port = utilities.DisplayArray(2,tcpHeader->SourcePort);
+    source_port = utilities.DisplayArray(2,tcpHeader->SourcePort);
     printf("(%d)",source_port);
     printf("\n");
 
@@ -51,7 +37,12 @@ void TCPHeader::AnalyzeTCPHeader() {
 
     printf("Header Length:");
     printf("%01x",tcpHeader->OffsetReserveFlag[0]/16);
-    printf("(%d bytes)",4*(48+tcpHeader->OffsetReserveFlag[0]/16-'0'));
+    int32_t header_len = 4*(48+tcpHeader->OffsetReserveFlag[0]/16-'0');
+    printf("(%d bytes)",header_len);
+    if(header_len > 20){
+        used_offset += header_len - 20;
+    }
+    payload -= header_len;
     printf("\n");
 
     printf("Flags:");

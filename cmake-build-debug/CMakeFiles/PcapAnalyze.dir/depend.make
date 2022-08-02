@@ -5,6 +5,10 @@ CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.obj: ../ArpHeader.cpp
 CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.obj: ../ArpHeader.h
 CMakeFiles/PcapAnalyze.dir/ArpHeader.cpp.obj: ../Utilities.h
 
+CMakeFiles/PcapAnalyze.dir/DNSHeader.cpp.obj: ../DNSHeader.cpp
+CMakeFiles/PcapAnalyze.dir/DNSHeader.cpp.obj: ../DNSHeader.h
+CMakeFiles/PcapAnalyze.dir/DNSHeader.cpp.obj: ../Utilities.h
+
 CMakeFiles/PcapAnalyze.dir/Data.cpp.obj: ../Data.cpp
 CMakeFiles/PcapAnalyze.dir/Data.cpp.obj: ../Data.h
 CMakeFiles/PcapAnalyze.dir/Data.cpp.obj: ../Utilities.h
@@ -45,6 +49,7 @@ CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj: ../Utilities.cpp
 CMakeFiles/PcapAnalyze.dir/Utilities.cpp.obj: ../Utilities.h
 
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../ArpHeader.h
+CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../DNSHeader.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../Data.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../ICMPHeader.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../IPv4Header.h
@@ -54,5 +59,6 @@ CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../PacketHeader.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../PcapHeader.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../TCPHeader.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../UDPHeader.h
+CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../Utilities.h
 CMakeFiles/PcapAnalyze.dir/main.cpp.obj: ../main.cpp
 

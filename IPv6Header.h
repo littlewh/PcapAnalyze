@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
+#include "Utilities.h"
+
 /*共40字节*/
 
 struct ipv6_header{
@@ -34,11 +36,12 @@ public:
         map_nextheader[89] = "OSPFv3";
     }
     bool GetIPHeader(char *url,uint64_t offset,uint64_t &used_offset);//获取Header数据
-    void AnalyzeIPHeader();
+    void AnalyzeIPHeader(uint64_t &ipTotalLen);
     int nextHeader;
 private:
     ipv6_header *ipv6Header;
     std::map<int,std::string> map_nextheader;
+    Utilities utilities;
 };
 
 

@@ -5,6 +5,8 @@
 #ifndef PCAPANALYZE_UDPHEADER_H
 #define PCAPANALYZE_UDPHEADER_H
 #include <cstdint>
+#include "Utilities.h"
+
 /*共8字节*/
 
 struct udp_header{
@@ -19,11 +21,13 @@ public:
     UDPHeader(){
         udpHeader = new udp_header();
     }
-    bool GetTCPHeader(char *url,uint64_t offset,uint64_t &used_offset);//获取Header数据
-    void AnalyzeTCPHeader();
+    bool GetUDPHeader(char *url,uint64_t offset,uint64_t &used_offset);//获取Header数据
+    void AnalyzeUDPHeader(uint64_t &payload);
     int destination_port;
+    int source_port;
 private:
     udp_header *udpHeader;
+    Utilities utilities;
 };
 
 

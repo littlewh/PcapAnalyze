@@ -11,6 +11,7 @@
 #include "ICMPHeader.h"
 #include "UDPHeader.h"
 #include "Data.h"
+#include "DNSHeader.h"
 
 class PcapFile{
 public:
@@ -37,6 +38,11 @@ public:
                 break;
             }
             cnt ++;
+
+            if(cnt == 48){
+                break;
+            }
+
             printf("\n**********第%d个包**********\n",cnt);
             offset += 16;//到此 offset指向的是packet包头
 
@@ -63,13 +69,22 @@ private:
     ArpHeader arpHeader;
     ICMPHeader icmpHeader;
     UDPHeader udpHeader;
-    Data httpData;
+    HTTPRequestData httpRequestData;
+    HTTPRespoundData httpRespoundData;
+    DNSHeader dnsHeader;
+    DNSQueryData dnsQueryData;
+    DNSRespoundData dnsRespoundData;
 
     std::ifstream pcap_file;
     bool pcapFlag;//判断大小端
     char *url;//文件路径
-    uint64_t offset;//偏移量，为了fseek的定位
+    uint64_t offset;//当前偏移量，为了fseek的定位使用
     uint64_t CapLen;
+    /*
+     * 负载长度
+     * 为了防止出现存在mac帧尾的情况，不能使用Caplen计算payload，引入负载长度，从ip报文的length开始记录
+     */
+    uint64_t ipTotalLen;
 
     void inputPcapHeader();
     bool inputPackHeader();
@@ -80,8 +95,6 @@ private:
     void inputArpHeader(uint64_t &used_offset);
     void inputICMPHeader(uint64_t &used_offset);
     void inputUDPHeader(uint64_t &used_offset);
-    void inputData(uint64_t &used_offset,int caplen);
-
 };
 
 void PcapFile::inputPcapHeader() {
@@ -128,7 +141,7 @@ void PcapFile::inputIPv4Header(uint64_t &used_offset) {
 //    std::cout<<offset<<std::endl;
     std::cout<<"*****IPv4 Header*****\n";
     ipv4Header.GetIPHeader(url,offset,used_offset);
-    ipv4Header.AnalyzeIPHeader();
+    ipv4Header.AnalyzeIPHeader(used_offset,ipTotalLen);
 
     if(ipv4Header.ipProtocolType == 6){
         inputTCPHeader(used_offset);
@@ -146,7 +159,7 @@ void PcapFile::inputIPv6Header(uint64_t &used_offset) {
     std::cout<<"*****IPv6 Header*****\n";
 
     ipv6Header.GetIPHeader(url,offset,used_offset);
-    ipv6Header.AnalyzeIPHeader();
+    ipv6Header.AnalyzeIPHeader(ipTotalLen);
 
     if(ipv6Header.nextHeader == 6){
         inputTCPHeader(used_offset);
@@ -183,29 +196,42 @@ void PcapFile::inputTCPHeader(uint64_t &used_offset) {
 //    std::cout<<offset<<std::endl;
     std::cout<<"*****TCP Header*****\n";
     tcpHeader.GetTCPHeader(url,offset,used_offset);
-    tcpHeader.AnalyzeTCPHeader();
+    tcpHeader.AnalyzeTCPHeader(used_offset,ipTotalLen);
 
-    if(tcpHeader.tcp_flags == 0x18 && tcpHeader.destination_port == 80){//PSH,ACK  80端口httpget请求
-        inputData(used_offset,CapLen);
+    if(tcpHeader.tcp_flags == 0x18 && tcpHeader.destination_port == 80){//PSH,ACK  80端口http请求
+        std::cout<<"*****Data GET*****\n";
+        httpRequestData.GetData(url,offset,used_offset,ipTotalLen);
+        httpRequestData.AnalyzeHTTPRequestData();
+    }
+    else if(tcpHeader.tcp_flags == 0x18 && tcpHeader.source_port == 80){//PSH,ACK  80端口http响应
+        std::cout<<"*****Data GET*****\n";
+        httpRespoundData.GetData(url,offset,used_offset,ipTotalLen);
+        httpRespoundData.AnalyzeHTTPRespoundData();
     }
 }
 
 void PcapFile::inputUDPHeader(uint64_t &used_offset) {
     std::cout<<"*****UDP Header*****\n";
-    udpHeader.GetTCPHeader(url,offset,used_offset);
-    udpHeader.AnalyzeTCPHeader();
+    udpHeader.GetUDPHeader(url,offset,used_offset);
+    udpHeader.AnalyzeUDPHeader(ipTotalLen);
 
-    if(udpHeader.destination_port == 53){//DNS协议
-        inputData(used_offset,CapLen);
+    if(udpHeader.destination_port == 53 || udpHeader.source_port == 53){//DNS协议
+        std::cout<<"*****DNS Header*****\n";
+        dnsHeader.GetDNSHeader(url,offset,used_offset);
+        dnsHeader.AnalyzeDNSHeader(ipTotalLen);
+//        std::cout<<ipTotalLen<<std::endl;
+        if(dnsHeader.dns_Type == 0){//请求
+            std::cout<<"*****Data GET*****\n";
+            dnsQueryData.GetData(url,offset,used_offset,ipTotalLen);
+            dnsQueryData.AnalyzeDNSData(ipTotalLen);
+        }
+        else{//响应
+            std::cout<<"*****Data GET*****\n";
+            dnsRespoundData.GetData(url,offset,used_offset,ipTotalLen);
+            dnsRespoundData.AnalyzeDNSData(ipTotalLen);
+        }
     }
-    else if (udpHeader.destination_port == 1900) {//SSDP协议
-        inputData(used_offset,CapLen);
-    }
-}
 
-void PcapFile::inputData(uint64_t &used_offset, int caplen) {
-    std::cout<<"*****Data GET*****\n";
-    httpData.GetHttpData(url,offset,used_offset,caplen);
 }
 
 int main() {

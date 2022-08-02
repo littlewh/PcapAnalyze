@@ -4,26 +4,17 @@
 
 #include <iostream>
 #include "MacHeader.h"
-#include "Utilities.h"
-
+/*
+ * 获取Mac包头
+ */
 bool::MacHeader::GetMacHeader(char *url,uint64_t offset,uint64_t &used_offset){
-    FILE *fp = fopen(url,"rb");
-    if (fp == NULL){
-        printf("获取MacHeader时打开文件失败");
-        return false;
-    }
-    else {
-        offset += used_offset;
-        fseek(fp,offset,SEEK_SET);
-        fread(macHeader,14,1,fp);
-        used_offset += 14;
-        fclose(fp);
-        return true;
-    }
+    return utilities.inputHeader(url,offset,used_offset,14,macHeader);
 }
-
+/*
+ * 分析Mac包头
+ */
 void::MacHeader::AnalyzeMacHeader(){
-    Utilities utilities;
+
 
     printf("Destination:");
     for (int i = 0;i < 6;i++){
