@@ -9,9 +9,17 @@
  * 获取HTTP数据
  */
 bool Data::GetData(char *url, uint64_t offset, uint64_t &used_offset, uint64_t payload) {
-    char data[payload];
+    uint8_t data[payload];
     bool flag = utilities.inputHeader(url,offset,used_offset,payload,data);
-    message_data = data;
+    for(int i = 0;i < payload;i++){
+        printf("%02x ",data[i]);
+    }
+    printf("\n");
+    message_data = (char*)data;
+//    for(int i = 0;i < payload;i++){
+//        printf("%02x ",(uint8_t)message_data[i]);
+//    }
+
 //    std::cout<<payload<<std::endl;
 //    std::cout<<message_data<<std::endl;
 
@@ -87,7 +95,7 @@ void HTTPRequestData::AnalyzeHTTPRequestData() {
  * 分析http响应报文
  */
 
-void HTTPRespoundData::AnalyzeHTTPRespoundData() {
+void HTTPRespondData::AnalyzeHTTPRespondData() {
 //    std::cout<<message_data<<std::endl;
     //响应行
 
@@ -144,14 +152,22 @@ void HTTPRespoundData::AnalyzeHTTPRespoundData() {
  * 分析DNS查询报文
  */
 
-void DNSQueryData::AnalyzeDNSData(uint64_t payload) {
-//    pre = payload;
+void DNSQueryData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID) {
+    uint8_t data[payload];
+    utilities.inputHeader(url,offset,used_offset,payload,data);
+    for(int i = 0;i < payload;i++){
+        printf("%02x ",data[i]);
+    }
+    printf("\n");
+    context = "";
     for(int i = 1;i < payload-5;i++){
-        if(message_data[i] < 'a' || message_data[i] > 'z'){
+        if(data[i] < 'a' || data[i] > 'z'){
             std::cout<<".";
+            context += '.';
         }
         else{
-            std::cout<<message_data[i];
+            std::cout<<data[i];
+            context += data[i];
         }
     }
     printf("\n");
@@ -160,16 +176,16 @@ void DNSQueryData::AnalyzeDNSData(uint64_t payload) {
     uint64_t type = 0;
     for(int i = payload-4;i < payload-2;i++){
         type <<= 8;
-        type += 48+message_data[i]-'0';
-        printf("%x",message_data[i]);
+        type += 48+(uint8_t)data[i]-'0';
+        printf("%x",(uint8_t)data[i]);
     }
     std::cout<<"("<<map_Type[type]<<")"<<std::endl;
     printf("Class:");
     uint64_t Class = 0;
     for(int i = payload-2;i < payload;i++){
         Class <<= 8;
-        Class += 48+message_data[i]-'0';
-        printf("%x",message_data[i]);
+        Class += 48+(uint8_t)data[i]-'0';
+        printf("%x",(uint8_t)data[i]);
     }
     std::cout<<"("<<map_Class[Class]<<")"<<std::endl;
 }
@@ -178,6 +194,283 @@ void DNSQueryData::AnalyzeDNSData(uint64_t payload) {
  * 分析DNS响应报文
  */
 
-void DNSRespoundData::AnalyzeDNSData(uint64_t payload) {
+void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID) {
 //    std::cout<<pre;
+//    std::cout<<message_data<<std::endl;
+
+    uint8_t data[payload];
+    utilities.inputHeader(url,offset,used_offset,payload,data);
+    for(int i = 0;i < payload;i++){
+        printf("%02x ",data[i]);
+    }
+    printf("\n");
+
+    if(DNS_session[TransactionID].empty()){
+        std::cout<<"Meaningless Message！"<<std::endl;
+    }
+    else{
+        uint64_t length = DNS_session[TransactionID].front().context.length();
+        length += 2;
+
+//        std::cout<<length<<" "<<DNS_session[TransactionID].front().context<<std::endl;
+
+        context = "";
+        for(int i = 1;i < length-1;i++){
+            if(data[i] < 'a' || data[i] > 'z'){
+                std::cout<<".";
+                context += '.';
+            }
+            else{
+                std::cout<<data[i];
+                context += (char)data[i];
+            }
+        }
+        printf("\n");
+
+        printf("Type:");
+        uint64_t type = 0;
+        for(int i = length;i < length+2;i++){
+            type <<= 8;
+            type += 48+(uint8_t)data[i]-'0';
+            printf("%x",(uint8_t)data[i]);
+        }
+        std::cout<<"("<<map_Type[type]<<")"<<std::endl;
+        length += 2;
+
+        printf("Class:");
+        uint64_t Class = 0;
+        for(int i = length;i < length+2;i++){
+            Class <<= 8;
+            Class += 48+(uint8_t)data[i]-'0';
+            printf("%x",(uint8_t)data[i]);
+        }
+        std::cout<<"("<<map_Class[Class]<<")"<<std::endl;
+        length += 2;
+
+        payload -= length;
+//        std::cout<<"payload"<<payload<<std::endl;
+        while(payload){
+            length += 2;//Name
+            payload -= 2;
+
+            uint64_t answer_type = 0;
+            for(int i = length;i < length+2;i++){
+                answer_type <<= 8;
+                answer_type += 48+((uint8_t)data[i])-'0';
+//                printf("%02x ",(uint8_t)message_data[i]);
+            }
+            length += 2;//Type
+            payload -= 2;
+
+            if(answer_type == 5){//0x0005
+                std::cout<<"Type:CNAME"<<std::endl;
+                printf("Class:");
+                uint64_t number = 0;
+                for(int i = length;i < length+2;i++){
+                    number <<= 8;
+                    number += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<map_Class[number]<<")"<<std::endl;
+                length += 2;
+                payload -= 2;
+
+                printf("Time to live:");
+                number = 0;
+                for(int i = length;i < length+4;i++){
+                    number <<= 8;
+                    number += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<number<<")"<<std::endl;
+                length += 4;
+                payload -= 4;
+
+                printf("Data Length:");
+                uint64_t data_length = 0;
+                for(int i = length;i < length+2;i++){
+                    data_length <<= 8;
+                    data_length += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<data_length<<")"<<std::endl;
+                length += 2;
+                payload -= 2;
+
+                printf("CNAME:");
+                cname = "";
+                for(int i = length+1;i < length+data_length-2;i++){
+                    if(data[i] < 'a' || data[i] > 'z'){
+                        std::cout<<".";
+                        cname += '.';
+                    }
+                    else{
+                        std::cout<<data[i];
+                        cname += (char)data[i];
+                    }
+//                    printf("%02x ",(uint8_t)message_data[i]);
+                }
+                cname += ';';
+                length += data_length;
+                payload -= data_length;
+//                std::cout<<"\npayload:"<<payload<<std::endl;
+                printf("\n");
+
+            }
+            else if (answer_type == 1){
+                std::cout<<"\tType:A\n";
+
+                printf("Class:");
+                uint64_t number = 0;
+                for(int i = length;i < length+2;i++){
+                    number <<= 8;
+                    number += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<map_Class[number]<<")"<<std::endl;
+                length += 2;
+
+                printf("Time to live:");
+                number = 0;
+                for(int i = length;i < length+4;i++){
+                    number <<= 8;
+                    number += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<number<<")"<<std::endl;
+                length += 4;
+
+                printf("Data Length:");
+                uint64_t data_length = 0;
+                for(int i = length;i < length+2;i++){
+                    data_length <<= 8;
+                    data_length += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<data_length<<")"<<std::endl;
+                length += 2;
+
+                printf("Address:");
+                int cnt = 0;
+                address = "";
+                for(int i = length;i < length+data_length;i++){
+                    cnt++;
+                    address += std::to_string(48+data[i]-'0');
+                    if(cnt <= 3){
+                        address += '.';
+                    }
+
+                }
+                std::cout<<address;
+                length += data_length;
+                printf("\n");
+            }
+            else if (answer_type == 6){
+                std::cout<<"\tType:SOA"<<std::endl;
+                printf("Class:");
+                uint64_t number = 0;
+                for(int i = length;i < length+2;i++){
+                    number <<= 8;
+                    number += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<map_Class[number]<<")"<<std::endl;
+                length += 2;
+                payload -= 2;
+                printf("Time to live:");
+                number = 0;
+                for(int i = length;i < length+4;i++){
+                    number <<= 8;
+                    number += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<number<<")"<<std::endl;
+                length += 4;
+                payload -= 4;
+
+                printf("Data Length:");
+                uint64_t data_length = 0;
+                for(int i = length;i < length+2;i++){
+                    data_length <<= 8;
+                    data_length += 48+(uint8_t)data[i]-'0';
+                    printf("%x",(uint8_t)data[i]);
+                }
+                std::cout<<"("<<data_length<<")"<<std::endl;
+                length += 2;
+                payload -= 2;
+
+                for(int i = length;i < length+data_length-20;i++){
+                    if(data[i] >= '0' && data[i] <= '9'){
+                        std::cout<<data[i];
+                    }
+                    else if (data[i] >= 'a' && data[i] <= 'z'){
+                        std::cout<<data[i];
+                    }
+                    else if (data[i] == '_'){
+                        std::cout<<data[i];
+                    }
+                    else{
+                        if(data[i-1] == 'm'&&data[i-2] == 'o'&&data[i-3] == 'c'){
+                            std::cout<<";";
+                        }
+                        else{
+                            std::cout<<".";
+                        }
+                    }
+                }
+                printf("\n");
+
+                printf("SerialNumber:");
+                uint64_t snumber = 0;
+                for(int i = length+data_length-20;i < length+data_length-16;i++){
+                    snumber <<= 8;
+                    snumber += 48+data[i]-'0';
+                    printf("%02x",data[i]);
+                }
+                std::cout<<"("<<snumber<<")"<<std::endl;
+
+                printf("RefreshInterval:");
+                uint64_t refresh = 0;
+                for(int i = length+data_length-16;i < length+data_length-12;i++){
+                    refresh <<= 8;
+                    refresh += 48+data[i]-'0';
+                    printf("%02x",data[i]);
+                }
+                std::cout<<"("<<refresh<<")"<<std::endl;
+
+                printf("RetryInterval:");
+                uint64_t retry = 0;
+                for(int i = length+data_length-12;i < length+data_length-8;i++){
+                    retry <<= 8;
+                    retry += 48+data[i]-'0';
+                    printf("%02x",data[i]);
+                }
+                std::cout<<"("<<retry<<")"<<std::endl;
+
+                printf("ExpireLimit:");
+                uint64_t expire = 0;
+                for(int i = length+data_length-8;i < length+data_length-4;i++){
+                    expire <<= 8;
+                    expire += 48+data[i]-'0';
+                    printf("%02x",data[i]);
+                }
+                std::cout<<"("<<expire<<")"<<std::endl;
+
+                printf("MinimumTTL:");
+                uint64_t minttl = 0;
+                for(int i = length+data_length-4;i < length+data_length;i++){
+                    minttl <<= 8;
+                    minttl += 48+data[i]-'0';
+                    printf("%02x",data[i]);
+                }
+                std::cout<<"("<<minttl<<")"<<std::endl;
+
+                length += data_length;
+                payload -= data_length;
+//                std::cout<<"\npayload:"<<payload<<std::endl;
+                printf("\n");
+            }
+        }
+
+    }
 }

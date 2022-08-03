@@ -40,6 +40,8 @@ public:
     // IP解析头
     void AnalyzeIPHeader(uint64_t &used_offset,uint64_t &ipTotalLen);
     int ipProtocolType;
+    uint32_t source_ip;
+    uint32_t destination_ip;
 private:
     ipv4_header *ipv4Header;
     std::map<uint8_t ,std::string> map_protocol;

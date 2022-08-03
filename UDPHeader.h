@@ -23,8 +23,8 @@ public:
     }
     bool GetUDPHeader(char *url,uint64_t offset,uint64_t &used_offset);//获取Header数据
     void AnalyzeUDPHeader(uint64_t &payload);
-    int destination_port;
-    int source_port;
+    uint32_t destination_port;
+    uint32_t source_port;
 private:
     udp_header *udpHeader;
     Utilities utilities;

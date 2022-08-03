@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <deque>
 #include "PcapHeader.h"
 #include "PacketHeader.h"
 #include "MacHeader.h"
@@ -12,6 +13,7 @@
 #include "UDPHeader.h"
 #include "Data.h"
 #include "DNSHeader.h"
+
 
 class PcapFile{
 public:
@@ -39,7 +41,7 @@ public:
             }
             cnt ++;
 
-            if(cnt == 48){
+            if(cnt == 65){
                 break;
             }
 
@@ -58,7 +60,7 @@ public:
         fclose(fp);
 
     }
-
+    void displayDNSSession();
 private:
     PcapHeader pcapHeader;
     PacketHeader packetHeader;
@@ -70,10 +72,10 @@ private:
     ICMPHeader icmpHeader;
     UDPHeader udpHeader;
     HTTPRequestData httpRequestData;
-    HTTPRespoundData httpRespoundData;
+    HTTPRespondData httpRespondData;
     DNSHeader dnsHeader;
     DNSQueryData dnsQueryData;
-    DNSRespoundData dnsRespoundData;
+    DNSRespondData dnsRespondData;
 
     std::ifstream pcap_file;
     bool pcapFlag;//判断大小端
@@ -86,6 +88,9 @@ private:
      */
     uint64_t ipTotalLen;
 
+    std::map<uint64_t,std::deque<session_elements>> DNS_session;
+    std::map<uint64_t,std::deque<session_elements>>::iterator it;
+
     void inputPcapHeader();
     bool inputPackHeader();
     void inputMacHeader(uint64_t &used_offset);
@@ -95,6 +100,7 @@ private:
     void inputArpHeader(uint64_t &used_offset);
     void inputICMPHeader(uint64_t &used_offset);
     void inputUDPHeader(uint64_t &used_offset);
+
 };
 
 void PcapFile::inputPcapHeader() {
@@ -205,8 +211,8 @@ void PcapFile::inputTCPHeader(uint64_t &used_offset) {
     }
     else if(tcpHeader.tcp_flags == 0x18 && tcpHeader.source_port == 80){//PSH,ACK  80端口http响应
         std::cout<<"*****Data GET*****\n";
-        httpRespoundData.GetData(url,offset,used_offset,ipTotalLen);
-        httpRespoundData.AnalyzeHTTPRespoundData();
+        httpRespondData.GetData(url,offset,used_offset,ipTotalLen);
+        httpRespondData.AnalyzeHTTPRespondData();
     }
 }
 
@@ -219,25 +225,67 @@ void PcapFile::inputUDPHeader(uint64_t &used_offset) {
         std::cout<<"*****DNS Header*****\n";
         dnsHeader.GetDNSHeader(url,offset,used_offset);
         dnsHeader.AnalyzeDNSHeader(ipTotalLen);
+        session_elements temp_elements;
+        temp_elements.source_ip = ipv4Header.source_ip;
+        temp_elements.destination_ip = ipv4Header.destination_ip;
+        temp_elements.source_port = udpHeader.source_port;
+        temp_elements.destination_port = udpHeader.destination_port;
+        temp_elements.message_type = dnsHeader.dns_Type;
+        std::string context;
 //        std::cout<<ipTotalLen<<std::endl;
         if(dnsHeader.dns_Type == 0){//请求
             std::cout<<"*****Data GET*****\n";
-            dnsQueryData.GetData(url,offset,used_offset,ipTotalLen);
-            dnsQueryData.AnalyzeDNSData(ipTotalLen);
+            dnsQueryData.AnalyzeDNSData(url, offset, used_offset,ipTotalLen,DNS_session,dnsHeader.TransactionID);
+            temp_elements.context = dnsQueryData.context;
         }
         else{//响应
             std::cout<<"*****Data GET*****\n";
-            dnsRespoundData.GetData(url,offset,used_offset,ipTotalLen);
-            dnsRespoundData.AnalyzeDNSData(ipTotalLen);
+            dnsRespondData.AnalyzeDNSData(url,offset,used_offset,ipTotalLen,DNS_session,dnsHeader.TransactionID);
+            temp_elements.context = dnsRespondData.context;
+            temp_elements.cname = dnsRespondData.cname;
+            temp_elements.address = dnsRespondData.address;
+        }
+
+        DNS_session[dnsHeader.TransactionID].push_back(temp_elements);
+    }
+}
+
+/*
+ * 显示会话
+ */
+void PcapFile::displayDNSSession() {
+    printf("**********DNS会话**********\n");
+    for(it = DNS_session.begin();it != DNS_session.end();it++){
+        std::cout<<"ID:"<<it->first<<std::endl;
+        while(!it->second.empty()){
+            if(it->second.front().message_type == 0){
+                std::cout<<"Queries:"<<std::endl;
+            }
+            else{
+                std::cout<<"Answer:"<<std::endl;
+            }
+            uint64_t source = it->second.front().source_ip;
+            std::cout<<"\tsource_ip:"<<(source>>24)<<"."<<((source>>16) -((source>>24)<<8))<<"."<<((source%65536 - source%256)>>8)<<"."<<source%256<<std::endl;
+            uint64_t des = it->second.front().destination_ip;
+            std::cout<<"\tdestination_ip:"<<(des>>24)<<"."<<((des>>16) -((des>>24)<<8))<<"."<<((des%65536 - des%256)>>8)<<"."<<des%256<<std::endl;
+            std::cout<<"\tsource_port:"<<it->second.front().source_port<<std::endl;
+            std::cout<<"\tdestination_port:"<<it->second.front().destination_port<<std::endl;
+            std::cout<<"\tcontext:"<<it->second.front().context<<std::endl;
+            if(it->second.front().message_type == 1){
+                std::cout<<"\tCname:"<<it->second.front().cname<<std::endl;
+                std::cout<<"\tAddress:"<<it->second.front().address<<std::endl;
+            }
+            std::cout<<std::endl;
+            it->second.pop_front();
+
         }
     }
-
 }
 
 int main() {
 
     PcapFile pf;
     pf.inputFile();
-
+    pf.displayDNSSession();
     return 0;
 }

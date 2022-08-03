@@ -60,7 +60,7 @@ void::IPv4Header::AnalyzeIPHeader(uint64_t &used_offset,uint64_t &ipTotalLen){
     printf("\n");
 
     printf("Source Address:");
-    utilities.DisplayArray(4,ipv4Header->SourceAddress);
+    source_ip = utilities.DisplayArray(4,ipv4Header->SourceAddress);
     printf("(");//转为十进制的ip形式
     for(int i = 0;i < 4;i++){
         printf("%d",48+ipv4Header->SourceAddress[i]-'0');
@@ -72,7 +72,7 @@ void::IPv4Header::AnalyzeIPHeader(uint64_t &used_offset,uint64_t &ipTotalLen){
     printf("\n");
 
     printf("Destination Address:");
-    utilities.DisplayArray(4,ipv4Header->DestinationAddress);
+    destination_ip = utilities.DisplayArray(4,ipv4Header->DestinationAddress);
     printf("(");//转为十进制的ip形式
     for(int i = 0;i < 4;i++){
         printf("%d",48+ipv4Header->DestinationAddress[i]-'0');

@@ -5,8 +5,19 @@
 #ifndef PCAPANALYZE_DATA_H
 #define PCAPANALYZE_DATA_H
 #include <iostream>
+#include <deque>
 #include "Utilities.h"
 
+struct session_elements{
+    uint32_t source_ip;
+    uint32_t destination_ip;
+    uint32_t source_port;
+    uint32_t destination_port;
+    std::string context;
+    std::string cname;
+    std::string address;
+    bool message_type;//0 query   1 answer
+};
 class Data {
 public:
     bool GetData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t caplen);
@@ -32,9 +43,9 @@ private:
     std::string httpHeader;//请求头
     std::string httpBody;//请求体
 };
-class HTTPRespoundData:public Data{
+class HTTPRespondData:public Data{
 public:
-    void AnalyzeHTTPRespoundData();
+    void AnalyzeHTTPRespondData();
 private:
     http_status_line httpStatusLine;//状态行
     std::string httpHeader;//请求头
@@ -45,11 +56,13 @@ class DNSData:public Data{
 public:
     DNSData(){
         map_Type[1] = "A";
+        map_Type[28] = "AAAA";
         map_Class[1] = "IN";
     }
-    virtual void AnalyzeDNSData(uint64_t payload) = 0;
+    virtual void AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID) = 0;
     std::map<int,std::string > map_Type;
     std::map<int,std::string > map_Class;
+    std::string context;
 //    static uint32_t pre;
 private:
 
@@ -58,15 +71,17 @@ private:
 class DNSQueryData:public DNSData{
 public:
 
-    virtual void AnalyzeDNSData(uint64_t payload);
+    virtual void AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID);
 
 private:
 
 };
 
-class DNSRespoundData:public DNSData{
+class DNSRespondData:public DNSData{
 public:
-    virtual void AnalyzeDNSData(uint64_t payload);
+    virtual void AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID);
+    std::string cname;
+    std::string address;
 private:
 
 };
