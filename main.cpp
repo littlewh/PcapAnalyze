@@ -67,15 +67,7 @@ private:
     MacHeader macHeader;
     IPv4Header ipv4Header;
     IPv6Header ipv6Header;
-    TCPHeader tcpHeader;
-    ArpHeader arpHeader;
-    ICMPHeader icmpHeader;
-    UDPHeader udpHeader;
-    HTTPRequestData httpRequestData;
-    HTTPRespondData httpRespondData;
-    DNSHeader dnsHeader;
-    DNSQueryData dnsQueryData;
-    DNSRespondData dnsRespondData;
+
 
     std::ifstream pcap_file;
     bool pcapFlag;//判断大小端
@@ -180,12 +172,14 @@ void PcapFile::inputIPv6Header(uint64_t &used_offset) {
 
 void PcapFile::inputArpHeader(uint64_t &used_offset) {
     std::cout<<"*****Arp Header*****\n";
+    ArpHeader arpHeader;
     arpHeader.GetArpHeader(url,offset,used_offset);
     arpHeader.AnalyzeArpHeader();
 }
 
 void PcapFile::inputICMPHeader(uint64_t &used_offset) {
     std::cout<<"*****ICMP Header*****\n";
+    ICMPHeader icmpHeader;
     icmpHeader.GetICMPHeader(url,offset,used_offset);
     icmpHeader.AnalyzeICMPHeader();
     if(icmpHeader.errorFlag == true){//差错报文包含下层ip报
@@ -201,16 +195,19 @@ void PcapFile::inputICMPHeader(uint64_t &used_offset) {
 void PcapFile::inputTCPHeader(uint64_t &used_offset) {
 //    std::cout<<offset<<std::endl;
     std::cout<<"*****TCP Header*****\n";
+    TCPHeader tcpHeader;
     tcpHeader.GetTCPHeader(url,offset,used_offset);
     tcpHeader.AnalyzeTCPHeader(used_offset,ipTotalLen);
 
     if(tcpHeader.tcp_flags == 0x18 && tcpHeader.destination_port == 80){//PSH,ACK  80端口http请求
         std::cout<<"*****Data GET*****\n";
+        HTTPRequestData httpRequestData;
         httpRequestData.GetData(url,offset,used_offset,ipTotalLen);
         httpRequestData.AnalyzeHTTPRequestData();
     }
     else if(tcpHeader.tcp_flags == 0x18 && tcpHeader.source_port == 80){//PSH,ACK  80端口http响应
         std::cout<<"*****Data GET*****\n";
+        HTTPRespondData httpRespondData;
         httpRespondData.GetData(url,offset,used_offset,ipTotalLen);
         httpRespondData.AnalyzeHTTPRespondData();
     }
@@ -218,10 +215,12 @@ void PcapFile::inputTCPHeader(uint64_t &used_offset) {
 
 void PcapFile::inputUDPHeader(uint64_t &used_offset) {
     std::cout<<"*****UDP Header*****\n";
+    UDPHeader udpHeader;
     udpHeader.GetUDPHeader(url,offset,used_offset);
     udpHeader.AnalyzeUDPHeader(ipTotalLen);
 
     if(udpHeader.destination_port == 53 || udpHeader.source_port == 53){//DNS协议
+        DNSHeader dnsHeader;
         std::cout<<"*****DNS Header*****\n";
         dnsHeader.GetDNSHeader(url,offset,used_offset);
         dnsHeader.AnalyzeDNSHeader(ipTotalLen);
@@ -235,15 +234,20 @@ void PcapFile::inputUDPHeader(uint64_t &used_offset) {
 //        std::cout<<ipTotalLen<<std::endl;
         if(dnsHeader.dns_Type == 0){//请求
             std::cout<<"*****Data GET*****\n";
+            DNSQueryData dnsQueryData;
             dnsQueryData.AnalyzeDNSData(url, offset, used_offset,ipTotalLen,DNS_session,dnsHeader.TransactionID);
             temp_elements.context = dnsQueryData.context;
+            temp_elements.query_type = dnsQueryData.query_type;
         }
         else{//响应
             std::cout<<"*****Data GET*****\n";
+            DNSRespondData dnsRespondData;
             dnsRespondData.AnalyzeDNSData(url,offset,used_offset,ipTotalLen,DNS_session,dnsHeader.TransactionID);
+            temp_elements.query_type = dnsRespondData.query_type;
             temp_elements.context = dnsRespondData.context;
             temp_elements.cname = dnsRespondData.cname;
             temp_elements.address = dnsRespondData.address;
+            temp_elements.query_type = dnsRespondData.query_type;
         }
 
         DNS_session[dnsHeader.TransactionID].push_back(temp_elements);
@@ -277,7 +281,6 @@ void PcapFile::displayDNSSession() {
             }
             std::cout<<std::endl;
             it->second.pop_front();
-
         }
     }
 }

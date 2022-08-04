@@ -173,13 +173,13 @@ void DNSQueryData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_off
     printf("\n");
 
     printf("Type:");
-    uint64_t type = 0;
+    query_type = 0;
     for(int i = payload-4;i < payload-2;i++){
-        type <<= 8;
-        type += 48+(uint8_t)data[i]-'0';
+        query_type <<= 8;
+        query_type += 48+(uint8_t)data[i]-'0';
         printf("%x",(uint8_t)data[i]);
     }
-    std::cout<<"("<<map_Type[type]<<")"<<std::endl;
+    std::cout<<"("<<map_Type[query_type]<<")"<<std::endl;
     printf("Class:");
     uint64_t Class = 0;
     for(int i = payload-2;i < payload;i++){
@@ -228,13 +228,13 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
         printf("\n");
 
         printf("Type:");
-        uint64_t type = 0;
+        query_type = 0;
         for(int i = length;i < length+2;i++){
-            type <<= 8;
-            type += 48+(uint8_t)data[i]-'0';
+            query_type <<= 8;
+            query_type += 48+(uint8_t)data[i]-'0';
             printf("%x",(uint8_t)data[i]);
         }
-        std::cout<<"("<<map_Type[type]<<")"<<std::endl;
+        std::cout<<"("<<map_Type[query_type]<<")"<<std::endl;
         length += 2;
 
         printf("Class:");
@@ -249,7 +249,16 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
 
         payload -= length;
 //        std::cout<<"payload"<<payload<<std::endl;
+
+        cname = "";//避免累加上一次的内容
+        address = "";
+        mailbox = "";
+
         while(payload){
+            uint8_t _name[2];
+            _name[0] = data[length];
+            _name[1] = data[length+1];
+
             length += 2;//Name
             payload -= 2;
 
@@ -262,43 +271,13 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
             length += 2;//Type
             payload -= 2;
 
-            if(answer_type == 5){//0x0005
-                std::cout<<"Type:CNAME"<<std::endl;
-                printf("Class:");
-                uint64_t number = 0;
-                for(int i = length;i < length+2;i++){
-                    number <<= 8;
-                    number += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<map_Class[number]<<")"<<std::endl;
-                length += 2;
-                payload -= 2;
+            if(answer_type == 5){//CNAME
+                std::cout<<"\tType"<<map_Type[answer_type]<<":"<<std::endl;
 
-                printf("Time to live:");
-                number = 0;
-                for(int i = length;i < length+4;i++){
-                    number <<= 8;
-                    number += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<number<<")"<<std::endl;
-                length += 4;
-                payload -= 4;
-
-                printf("Data Length:");
-                uint64_t data_length = 0;
-                for(int i = length;i < length+2;i++){
-                    data_length <<= 8;
-                    data_length += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<data_length<<")"<<std::endl;
-                length += 2;
-                payload -= 2;
+                uint64_t data_length = utilities.DNSAnswerHeader(data,length,payload,map_Class);
 
                 printf("CNAME:");
-                cname = "";
+
                 for(int i = length+1;i < length+data_length-2;i++){
                     if(data[i] < 'a' || data[i] > 'z'){
                         std::cout<<".";
@@ -318,41 +297,13 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
 
             }
             else if (answer_type == 1){
-                std::cout<<"\tType:A\n";
+                std::cout<<"\tType"<<map_Type[answer_type]<<":"<<std::endl;//Host
 
-                printf("Class:");
-                uint64_t number = 0;
-                for(int i = length;i < length+2;i++){
-                    number <<= 8;
-                    number += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<map_Class[number]<<")"<<std::endl;
-                length += 2;
-
-                printf("Time to live:");
-                number = 0;
-                for(int i = length;i < length+4;i++){
-                    number <<= 8;
-                    number += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<number<<")"<<std::endl;
-                length += 4;
-
-                printf("Data Length:");
-                uint64_t data_length = 0;
-                for(int i = length;i < length+2;i++){
-                    data_length <<= 8;
-                    data_length += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<data_length<<")"<<std::endl;
-                length += 2;
+                uint64_t data_length = utilities.DNSAnswerHeader(data,length,payload,map_Class);
 
                 printf("Address:");
                 int cnt = 0;
-                address = "";
+
                 for(int i = length;i < length+data_length;i++){
                     cnt++;
                     address += std::to_string(48+data[i]-'0');
@@ -362,62 +313,54 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
 
                 }
                 std::cout<<address;
+                address += ";";
                 length += data_length;
                 printf("\n");
             }
             else if (answer_type == 6){
-                std::cout<<"\tType:SOA"<<std::endl;
-                printf("Class:");
-                uint64_t number = 0;
-                for(int i = length;i < length+2;i++){
-                    number <<= 8;
-                    number += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<map_Class[number]<<")"<<std::endl;
-                length += 2;
-                payload -= 2;
-                printf("Time to live:");
-                number = 0;
-                for(int i = length;i < length+4;i++){
-                    number <<= 8;
-                    number += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<number<<")"<<std::endl;
-                length += 4;
-                payload -= 4;
+                std::cout<<"\tType"<<map_Type[answer_type]<<":"<<std::endl;//SOA
 
-                printf("Data Length:");
-                uint64_t data_length = 0;
-                for(int i = length;i < length+2;i++){
-                    data_length <<= 8;
-                    data_length += 48+(uint8_t)data[i]-'0';
-                    printf("%x",(uint8_t)data[i]);
-                }
-                std::cout<<"("<<data_length<<")"<<std::endl;
-                length += 2;
-                payload -= 2;
+                uint64_t data_length = utilities.DNSAnswerHeader(data,length,payload,map_Class);
 
-                for(int i = length;i < length+data_length-20;i++){
+                bool flag = 0;
+                for(int i = length+1;i < length+data_length-20;i++){
                     if(data[i] >= '0' && data[i] <= '9'){
+                        if(flag){
+                            mailbox += data[i];
+                        }
                         std::cout<<data[i];
                     }
                     else if (data[i] >= 'a' && data[i] <= 'z'){
+                        if(flag){
+                            mailbox += data[i];
+                        }
                         std::cout<<data[i];
                     }
                     else if (data[i] == '_'){
+                        if(flag){
+                            mailbox += data[i];
+                        }
                         std::cout<<data[i];
                     }
                     else{
-                        if(data[i-1] == 'm'&&data[i-2] == 'o'&&data[i-3] == 'c'){
+                        if(data[i] == _name[0] && data[i+1] == _name[1]){
+                            std::cout<<"."<<context<<std::endl;
+                            i += 2;
+                            flag = 1;
+                        }
+                        else if(data[i-1] == 'm'&&data[i-2] == 'o'&&data[i-3] == 'c'){
                             std::cout<<";";
                         }
                         else{
+                            if(flag){
+                                mailbox += ".";
+                            }
                             std::cout<<".";
                         }
                     }
                 }
+                mailbox += "\bcom";
+//                std::cout<<mailbox;
                 printf("\n");
 
                 printf("SerialNumber:");
@@ -436,7 +379,7 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
                     refresh += 48+data[i]-'0';
                     printf("%02x",data[i]);
                 }
-                std::cout<<"("<<refresh<<")"<<std::endl;
+                std::cout<<"("<<refresh<<" seconds)"<<std::endl;
 
                 printf("RetryInterval:");
                 uint64_t retry = 0;
@@ -445,7 +388,7 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
                     retry += 48+data[i]-'0';
                     printf("%02x",data[i]);
                 }
-                std::cout<<"("<<retry<<")"<<std::endl;
+                std::cout<<"("<<retry<<" seconds)"<<std::endl;
 
                 printf("ExpireLimit:");
                 uint64_t expire = 0;
@@ -454,7 +397,7 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
                     expire += 48+data[i]-'0';
                     printf("%02x",data[i]);
                 }
-                std::cout<<"("<<expire<<")"<<std::endl;
+                std::cout<<"("<<expire<<" seconds)"<<std::endl;
 
                 printf("MinimumTTL:");
                 uint64_t minttl = 0;
@@ -463,7 +406,7 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
                     minttl += 48+data[i]-'0';
                     printf("%02x",data[i]);
                 }
-                std::cout<<"("<<minttl<<")"<<std::endl;
+                std::cout<<"("<<minttl<<" seconds)"<<std::endl;
 
                 length += data_length;
                 payload -= data_length;

@@ -15,6 +15,7 @@ public:
     uint64_t Find_KMP(char data_string[],char target_string[]);
     bool inputHeader(char *url, uint64_t offset, uint64_t &used_offset,uint64_t len,void *object);
     std::string findItemInData(std::string item_start,std::string item_end,std::string data);
+    uint64_t DNSAnswerHeader(uint8_t data[],uint64_t &length,uint64_t payload,std::map<int,std::string > &map_Class);
 private:
     void KMP_getnext(uint64_t tar_len,uint64_t data_len,int next[]);
     void KMP();

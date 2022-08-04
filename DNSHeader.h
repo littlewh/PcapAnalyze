@@ -7,48 +7,48 @@
 
 #include <cstdint>
 #include "Utilities.h"
-/* å…±12å­—èŠ‚*/
+/* ¹²12×Ö½Ú*/
 struct dns_header{
-    uint8_t TransactionID[2];//äº‹åŠ¡id
-    uint8_t Flags[2];//æ ‡å¿—
-    uint8_t Questions[2];//é—®é¢˜è®¡æ•°
-    uint8_t AnswerRRs[2];//å›ç­”èµ„æºè®°å½•æ•°
-    uint8_t AuthorityRRs[2];//æƒå¨åç§°æœåŠ¡å™¨è®¡æ•°
-    uint8_t AdditionalRRs[2];//é™„åŠ èµ„æºè®°å½•æ•°
+    uint8_t TransactionID[2];//ÊÂÎñid
+    uint8_t Flags[2];//±êÖ¾
+    uint8_t Questions[2];//ÎÊÌâ¼ÆÊı
+    uint8_t AnswerRRs[2];//»Ø´ğ×ÊÔ´¼ÇÂ¼Êı
+    uint8_t AuthorityRRs[2];//È¨ÍşÃû³Æ·şÎñÆ÷¼ÆÊı
+    uint8_t AdditionalRRs[2];//¸½¼Ó×ÊÔ´¼ÇÂ¼Êı
 };
 class DNSHeader {
 public:
     DNSHeader(){
         dnsHeader = new dns_header();
-        map_qr[0] = "request";
-        map_qr[1] = "response";
+        map_qr[0] = "²éÑ¯±¨ÎÄ";
+        map_qr[1] = "ÏìÓ¦±¨ÎÄ";
 
-        map_code[0] = "stand query";
-        map_code[1] = "reserve query";
-        map_code[2] = "status request";
+        map_code[0] = "±ê×¼²éÑ¯";
+        map_code[1] = "·´Ïò²éÑ¯";
+        map_code[2] = "·şÎñÆ÷×´Ì¬ÇëÇó";
 
-        map_aa[0] = "authority";
-        map_aa[1] = "not authority";
+        map_aa[0] = "²»ÊÇÈ¨Íş·şÎñÆ÷";
+        map_aa[1] = "È¨Íş·şÎñÆ÷";
 
-        map_tc[0] = "not truncated";
-        map_tc[1] = "truncated";
+        map_tc[0] = "²»¿É½Ø¶ÏµÄ";
+        map_tc[1] = "¿É½Ø¶ÏµÄ";
 
-        map_rd[0] = "do not recursively";
-        map_rd[1] = "do recursively";
+        map_rd[0] = "µü´ú²éÑ¯";
+        map_rd[1] = "µİ¹é²éÑ¯";
 
-        map_ra[0] = "not apply recursively";
-        map_ra[1] = "apply recursively";
+        map_ra[0] = "²»¿ÉÓÃµİ¹é²éÑ¯";
+        map_ra[1] = "¿ÉÓÃµİ¹é²éÑ¯";
 
-        map_rcode[0] = "no error";
-        map_rcode[1] = "Format Error";
-        map_rcode[2] = "Server failure";
-        map_rcode[3] = "Name Error";
-        map_rcode[4] = "NOt Implemented";
-        map_rcode[5] = "Refused";
+        map_rcode[0] = "Ã»ÓĞ´íÎó";
+        map_rcode[1] = "±¨ÎÄ¸ñÊ½´íÎó";
+        map_rcode[2] = "ÓòÃû·şÎñÆ÷Ê§°Ü";
+        map_rcode[3] = "Ãû×Ö´íÎó";
+        map_rcode[4] = "²éÑ¯ÀàĞÍ²»Ö§³Ö";
+        map_rcode[5] = "¾Ü¾ø";
     }
-    bool GetDNSHeader(char *url,uint64_t offset,uint64_t &used_offset);//è·å–Headeræ•°æ®
+    bool GetDNSHeader(char *url,uint64_t offset,uint64_t &used_offset);//»ñÈ¡HeaderÊı¾İ
     void AnalyzeDNSHeader(uint64_t &ipTotalLen);
-    bool dns_Type;//0æ˜¯æŸ¥è¯¢ï¼Œ1æ˜¯å“åº”
+    bool dns_Type;//0ÊÇ²éÑ¯£¬1ÊÇÏìÓ¦
     uint64_t TransactionID;//key
 private:
     dns_header *dnsHeader;

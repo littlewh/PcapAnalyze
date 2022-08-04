@@ -108,3 +108,41 @@ std::string Utilities::findItemInData(std::string item_start,std::string item_en
 
     return "";
 }
+
+/*
+ * 分析dns响应报文时的重复工作
+ */
+
+uint64_t Utilities::DNSAnswerHeader(uint8_t data[],uint64_t &length, uint64_t payload,std::map<int,std::string > &map_Class) {
+    printf("Class:");
+    uint64_t number = 0;
+    for(int i = length;i < length+2;i++){
+        number <<= 8;
+        number += 48+(uint8_t)data[i]-'0';
+        printf("%x",(uint8_t)data[i]);
+    }
+    std::cout<<"("<<map_Class[number]<<")"<<std::endl;
+    length += 2;
+
+    printf("Time to live:");
+    number = 0;
+    for(int i = length;i < length+4;i++){
+        number <<= 8;
+        number += 48+(uint8_t)data[i]-'0';
+        printf("%x",(uint8_t)data[i]);
+    }
+    std::cout<<"("<<number<<")"<<std::endl;
+    length += 4;
+
+    printf("Data Length:");
+    uint64_t data_length = 0;
+    for(int i = length;i < length+2;i++){
+        data_length <<= 8;
+        data_length += 48+(uint8_t)data[i]-'0';
+        printf("%x",(uint8_t)data[i]);
+    }
+    std::cout<<"("<<data_length<<")"<<std::endl;
+    length += 2;
+
+    return data_length;
+}

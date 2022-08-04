@@ -14,6 +14,7 @@ struct session_elements{
     uint32_t source_port;
     uint32_t destination_port;
     std::string context;
+    uint64_t query_type;
     std::string cname;
     std::string address;
     bool message_type;//0 query   1 answer
@@ -25,44 +26,47 @@ public:
     std::string message_data;
 };
 
-struct http_request_line{//è¯·æ±‚æŠ¥æ–‡çš„èµ·å§‹è¡Œ
-    std::string request_method;//è¯·æ±‚æ–¹æ³•
-    std::string request_target;//è¯·æ±‚ç›®æ ‡
-    std::string edition;//ç‰ˆæœ¬å·
+struct http_request_line{//ÇëÇó±¨ÎÄµÄÆğÊ¼ĞĞ
+    std::string request_method;//ÇëÇó·½·¨
+    std::string request_target;//ÇëÇóÄ¿±ê
+    std::string edition;//°æ±¾ºÅ
 };
-struct http_status_line{//å“åº”æŠ¥æ–‡çš„èµ·å§‹è¡Œ
-    std::string edition;//ç‰ˆæœ¬å·
-    std::string code;//çŠ¶æ€ç 
-    std::string reason;//åŸå› 
+struct http_status_line{//ÏìÓ¦±¨ÎÄµÄÆğÊ¼ĞĞ
+    std::string edition;//°æ±¾ºÅ
+    std::string code;//×´Ì¬Âë
+    std::string reason;//Ô­Òò
 };
 class HTTPRequestData:public Data{
 public:
     void AnalyzeHTTPRequestData();
 private:
-    http_request_line httpRequestLine;//è¯·æ±‚è¡Œ
-    std::string httpHeader;//è¯·æ±‚å¤´
-    std::string httpBody;//è¯·æ±‚ä½“
+    http_request_line httpRequestLine;//ÇëÇóĞĞ
+    std::string httpHeader;//ÇëÇóÍ·
+    std::string httpBody;//ÇëÇóÌå
 };
 class HTTPRespondData:public Data{
 public:
     void AnalyzeHTTPRespondData();
 private:
-    http_status_line httpStatusLine;//çŠ¶æ€è¡Œ
-    std::string httpHeader;//è¯·æ±‚å¤´
-    std::string httpBody;//è¯·æ±‚ä½“
+    http_status_line httpStatusLine;//×´Ì¬ĞĞ
+    std::string httpHeader;//ÇëÇóÍ·
+    std::string httpBody;//ÇëÇóÌå
 };
 
 class DNSData:public Data{
 public:
     DNSData(){
-        map_Type[1] = "A";
-        map_Type[28] = "AAAA";
+        map_Type[1] = "A:ÓòÃû·şÎñÆ÷µØÖ·";
+        map_Type[5] = "CNAME:ÓòÃû·şÎñÆ÷±ğÃû";
+        map_Type[6] = "SOA:È¨ÍşDNSÓòµÄÆğÊ¼Î»ÖÃ";
+        map_Type[28] = "AAAA:IPv6 Addrrss";
         map_Class[1] = "IN";
     }
     virtual void AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID) = 0;
     std::map<int,std::string > map_Type;
     std::map<int,std::string > map_Class;
     std::string context;
+    uint64_t query_type;
 //    static uint32_t pre;
 private:
 
@@ -82,6 +86,7 @@ public:
     virtual void AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID);
     std::string cname;
     std::string address;
+    std::string mailbox;
 private:
 
 };
