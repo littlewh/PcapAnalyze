@@ -14,11 +14,28 @@ struct session_elements{
     uint32_t source_port;
     uint32_t destination_port;
     std::string context;
-    uint64_t query_type;
+    std::string query_type_string;
     std::string cname;
     std::string address;
+    std::string nameserver;
+    std::string mailbox;
     bool message_type;//0 query   1 answer
 };
+
+struct session_elements_http{
+    uint64_t source_ip;
+    uint64_t destination_ip;
+    uint64_t source_port;
+    uint64_t destination_port;
+    std::string method;
+    std::string uri;//host+request
+    std::string body;
+    std::string edition;
+    std::string code;
+    std::string reason;
+    bool message_type;//0 query   1 answer
+};
+
 class Data {
 public:
     bool GetData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t caplen);
@@ -39,34 +56,40 @@ struct http_status_line{//响应报文的起始行
 class HTTPRequestData:public Data{
 public:
     void AnalyzeHTTPRequestData();
-private:
     http_request_line httpRequestLine;//请求行
     std::string httpHeader;//请求头
+    std::string uri;
     std::string httpBody;//请求体
+private:
 };
 class HTTPRespondData:public Data{
 public:
     void AnalyzeHTTPRespondData();
-private:
     http_status_line httpStatusLine;//状态行
     std::string httpHeader;//请求头
     std::string httpBody;//请求体
+private:
+
 };
 
 class DNSData:public Data{
 public:
     DNSData(){
         map_Type[1] = "A:域名服务器地址";
+        map_Type[2] = "NS:名字服务器";
         map_Type[5] = "CNAME:域名服务器别名";
-        map_Type[6] = "SOA:权威DNS域的起始位置";
-        map_Type[28] = "AAAA:IPv6 Addrrss";
-        map_Class[1] = "IN";
+        map_Type[6] = "SOA:授权标记一个区的开始";
+        map_Type[11] = "WKS:服务定义主机提供的网络服务";
+        map_Type[12] = "PTR:指针把IP地址转化为域名";
+        map_Type[28] = "AAAA:IPv6地址";
+        map_Type[255] = "ANY：对所有记录的请求";
+        map_Class[1] = "IN:互联网地址";
     }
     virtual void AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID) = 0;
     std::map<int,std::string > map_Type;
     std::map<int,std::string > map_Class;
     std::string context;
-    uint64_t query_type;
+    std::string query_type_string;
 //    static uint32_t pre;
 private:
 
@@ -86,6 +109,7 @@ public:
     virtual void AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_offset,uint64_t payload,std::map<uint64_t,std::deque<session_elements>> &DNS_session,uint64_t TransactionID);
     std::string cname;
     std::string address;
+    std::string nameserver;
     std::string mailbox;
 private:
 

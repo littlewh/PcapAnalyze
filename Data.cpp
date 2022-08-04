@@ -33,20 +33,23 @@ bool Data::GetData(char *url, uint64_t offset, uint64_t &used_offset, uint64_t p
 void HTTPRequestData::AnalyzeHTTPRequestData() {
     //请求行
 
-    std::string::size_type pos_start_line = message_data.find("\r\n");
+    std::string::size_type pos_start_line = message_data.find(0x0d0a);//换行
 //    std::cout<<pos_start_line;
     std::string start_line = message_data.substr(0,pos_start_line);
-
-    std::string::size_type pos_target = start_line.find(" ");
+//    std::cout<<"start line"<<start_line<<std::endl;
+    std::string::size_type pos_target = start_line.find(0x20);//空格
 //  std::cout<<pos_target;
     httpRequestLine.request_method = start_line.substr(0,pos_target);
+    /*
+     * @TODO:分包合并
+     */
     if(httpRequestLine.request_method != "POST" && httpRequestLine.request_method != "GET"){
         return;
     }
     std::cout<<"请求行:"<<std::endl;
     std::cout<<"Method:"<<httpRequestLine.request_method<<std::endl;
 
-    std::string::size_type pos_edition = start_line.find_last_of(" ");
+    std::string::size_type pos_edition = start_line.find_last_of(0x20);//空格
 //  std::cout<<pos_edition;
     httpRequestLine.request_target = start_line.substr(pos_target+1,pos_edition-pos_target-1);
     std::cout<<"Request Target:"<<httpRequestLine.request_target<<std::endl;
@@ -56,14 +59,24 @@ void HTTPRequestData::AnalyzeHTTPRequestData() {
 
 
     //请求头
-    std::cout<<"请求头"<<std::endl;
-    std::string::size_type pos_header = message_data.find_last_of("\r\n\r\n");//文件开始有一个空行，所以倒着找
+    std::cout<<"请求头:"<<std::endl;
+    std::string::size_type pos_header = message_data.find("\r\n\r\n");//空行
+//    std::cout<<pos_header<<std::endl;
+    if(pos_header != message_data.npos){
+        httpHeader = message_data.substr(pos_start_line+1,pos_header);
+    }
+    else{//报文没有结束
+//        std::cout<<"NO"<<std::endl;
+        httpHeader = message_data.substr(pos_start_line+1);
+    }
 //    std::cout<<pos_header;
-    httpHeader = message_data.substr(pos_start_line+1,pos_header);
+
 //    std::cout<<httpHeader<<std::endl;
 
     std::string host = utilities.findItemInData("Host:","\r\n",httpHeader);
     std::cout<<host<<std::endl;
+    uri = host;
+    uri += httpRequestLine.request_target;
 
     std::string agent = utilities.findItemInData("User-Agent:","\r\n",httpHeader);
     std::cout<<agent<<std::endl;
@@ -85,10 +98,15 @@ void HTTPRequestData::AnalyzeHTTPRequestData() {
 
 //    std::cout<<httpHeader<<std::endl;
 
-    std::cout<<"请求体"<<std::endl;
-    httpBody = message_data.substr(pos_header+1);
-    std::cout<<httpBody<<std::endl;
+    if(pos_header != message_data.npos){
+        std::cout<<"请求体:"<<std::endl;
+        httpBody = message_data.substr(pos_header+1);
+        std::cout<<httpBody<<std::endl;
+    }
+    else{//报文没有结束
+//        std::cout<<"NO"<<std::endl;
 
+    }
 }
 
 /*
@@ -105,11 +123,15 @@ void HTTPRespondData::AnalyzeHTTPRespondData() {
 
     std::string::size_type pos_target = start_line.find(" ");
 //  std::cout<<pos_target;
-    httpStatusLine.edition = start_line.substr(0,pos_target);
-    if(httpStatusLine.edition.find("HTTP") == httpStatusLine.edition.npos){
+    std::string ss_edition = start_line.substr(0,pos_target);
+    /*
+     * @TODO:分包合并
+     */
+    if(ss_edition.find("HTTP") == ss_edition.npos){
         return;
     }
     std::cout<<"响应行:"<<std::endl;
+    httpStatusLine.edition = ss_edition;
     std::cout<<"Edition:"<<httpStatusLine.edition<<std::endl;
 
     std::string::size_type pos_edition = start_line.find_last_of(" ");
@@ -124,6 +146,14 @@ void HTTPRespondData::AnalyzeHTTPRespondData() {
     //响应头
     std::cout<<"响应头"<<std::endl;
     std::string::size_type pos_header = message_data.find("\r\n\r\n");
+    std::cout<<pos_header<<std::endl;
+    if(pos_header != message_data.npos){
+        httpHeader = message_data.substr(pos_start_line+1,pos_header);
+    }
+    else{//报文没有结束
+//        std::cout<<"NO"<<std::endl;
+        httpHeader = message_data.substr(pos_start_line+1);
+    }
 //    std::cout<<pos_header;
     httpHeader = message_data.substr(pos_start_line+1,pos_header);
 //    std::cout<<httpHeader<<std::endl;
@@ -141,10 +171,16 @@ void HTTPRespondData::AnalyzeHTTPRespondData() {
     std::cout<<Accept_Encoding<<std::endl;
 
 //    std::cout<<httpHeader<<std::endl;
+    if(pos_header != message_data.npos){
+        std::cout<<"响应体"<<std::endl;
+        httpBody = message_data.substr(pos_header+1);
+        std::cout<<httpBody<<std::endl;
+    }
+    else{//报文没有结束
+//        std::cout<<"NO"<<std::endl;
 
-    std::cout<<"响应体"<<std::endl;
-    httpBody = message_data.substr(pos_header+1);
-    std::cout<<httpBody<<std::endl;
+    }
+
 
 }
 
@@ -161,24 +197,25 @@ void DNSQueryData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_off
     printf("\n");
     context = "";
     for(int i = 1;i < payload-5;i++){
-        if(data[i] < 'a' || data[i] > 'z'){
-            std::cout<<".";
-            context += '.';
-        }
-        else{
+        if((data[i] >= 'a' && data[i] <= 'z') || data[i] == '_' || (data[i] >= '0' && data[i] <= '9')){
             std::cout<<data[i];
             context += data[i];
+        }
+        else{
+            std::cout<<".";
+            context += '.';
         }
     }
     printf("\n");
 
     printf("Type:");
-    query_type = 0;
+    uint64_t query_type = 0;
     for(int i = payload-4;i < payload-2;i++){
         query_type <<= 8;
         query_type += 48+(uint8_t)data[i]-'0';
         printf("%x",(uint8_t)data[i]);
     }
+    query_type_string = map_Type[query_type];
     std::cout<<"("<<map_Type[query_type]<<")"<<std::endl;
     printf("Class:");
     uint64_t Class = 0;
@@ -216,24 +253,25 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
 
         context = "";
         for(int i = 1;i < length-1;i++){
-            if(data[i] < 'a' || data[i] > 'z'){
-                std::cout<<".";
-                context += '.';
-            }
-            else{
+            if((data[i] >= 'a' && data[i] <= 'z') || data[i] == '_' || (data[i] >= '0' && data[i] <= '9')){
                 std::cout<<data[i];
                 context += (char)data[i];
+            }
+            else{
+                std::cout<<".";
+                context += '.';
             }
         }
         printf("\n");
 
         printf("Type:");
-        query_type = 0;
+        uint64_t query_type = 0;
         for(int i = length;i < length+2;i++){
             query_type <<= 8;
             query_type += 48+(uint8_t)data[i]-'0';
             printf("%x",(uint8_t)data[i]);
         }
+        query_type_string = map_Type[query_type];
         std::cout<<"("<<map_Type[query_type]<<")"<<std::endl;
         length += 2;
 
@@ -255,10 +293,27 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
         mailbox = "";
 
         while(payload){
+//            std::cout<<"payload"<<payload<<std::endl;
             uint8_t _name[2];
             _name[0] = data[length];
             _name[1] = data[length+1];
-
+            uint64_t abridge_name = 48 + (_name[0]%64+_name[1]) -'0';//压缩后的域名标识符指示的位置
+//            std::cout<<"ab"<< abridge_name<<std::endl;
+            std::cout<<"\tNAME:";
+            for(int i = abridge_name-11;;i++){
+                if(data[i] == 0x00){
+                    break;
+                }
+                else{
+                    if((data[i] >= 'a' && data[i] <= 'z') || data[i] == '_' || (data[i] >= '0' && data[i] <= '9')){
+                        std::cout<<data[i];
+                    }
+                    else{
+                        std::cout<<".";
+                    }
+                }
+            }
+            std::cout<<std::endl;
             length += 2;//Name
             payload -= 2;
 
@@ -272,7 +327,7 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
             payload -= 2;
 
             if(answer_type == 5){//CNAME
-                std::cout<<"\tType"<<map_Type[answer_type]<<":"<<std::endl;
+                std::cout<<"\tType:"<<map_Type[answer_type]<<":"<<std::endl;
 
                 uint64_t data_length = utilities.DNSAnswerHeader(data,length,payload,map_Class);
 
@@ -297,7 +352,7 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
 
             }
             else if (answer_type == 1){
-                std::cout<<"\tType"<<map_Type[answer_type]<<":"<<std::endl;//Host
+                std::cout<<"\tType:"<<map_Type[answer_type]<<":"<<std::endl;//Host
 
                 uint64_t data_length = utilities.DNSAnswerHeader(data,length,payload,map_Class);
 
@@ -318,50 +373,71 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
                 printf("\n");
             }
             else if (answer_type == 6){
-                std::cout<<"\tType"<<map_Type[answer_type]<<":"<<std::endl;//SOA
+                std::cout<<"\tType:"<<map_Type[answer_type]<<":"<<std::endl;//SOA
 
                 uint64_t data_length = utilities.DNSAnswerHeader(data,length,payload,map_Class);
 
                 bool flag = 0;
                 for(int i = length+1;i < length+data_length-20;i++){
-                    if(data[i] >= '0' && data[i] <= '9'){
+                    if((data[i] >= 'a' && data[i] <= 'z') || data[i] == '_' || (data[i] >= '0' && data[i] <= '9')){
                         if(flag){
                             mailbox += data[i];
                         }
-                        std::cout<<data[i];
-                    }
-                    else if (data[i] >= 'a' && data[i] <= 'z'){
-                        if(flag){
-                            mailbox += data[i];
+                        else{
+                            nameserver += data[i];
                         }
-                        std::cout<<data[i];
+//                        std::cout<<data[i];
                     }
-                    else if (data[i] == '_'){
-                        if(flag){
-                            mailbox += data[i];
-                        }
-                        std::cout<<data[i];
-                    }
+
                     else{
-                        if(data[i] == _name[0] && data[i+1] == _name[1]){
-                            std::cout<<"."<<context<<std::endl;
+                        if((data[i]>>6) == 3){
+//                            std::cout<<"."<<context<<std::endl;
+                            abridge_name = 48 + (data[i]%64+data[i+1]) -'0';
+//                            std::cout<<"abr"<<abridge_name<<std::endl;
+                            for(int j = abridge_name-12;;j++){
+                                if(data[j] == 0x00){
+                                    break;
+                                }
+                                else{
+//                                    printf("%02x ",data[j]);
+                                    if((data[j] >= 'a' && data[j] <= 'z') || data[j] == '_' || (data[j] >= '0' && data[j] <= '9')){
+//                                        std::cout<<data[j];
+                                        if(flag){
+                                            mailbox += data[j];
+                                        }
+                                        else{
+                                            nameserver += data[j];
+                                        }
+                                    }
+                                    else{
+//                                        std::cout<<".";
+                                        if(flag){
+                                            mailbox += ".";
+                                        }
+                                        else{
+                                            nameserver += ".";
+                                        }
+                                    }
+                                }
+                            }
+                            std::cout<<std::endl;
                             i += 2;
                             flag = 1;
-                        }
-                        else if(data[i-1] == 'm'&&data[i-2] == 'o'&&data[i-3] == 'c'){
-                            std::cout<<";";
                         }
                         else{
                             if(flag){
                                 mailbox += ".";
                             }
-                            std::cout<<".";
+                            else{
+                                nameserver +=".";
+                            }
+//                            std::cout<<".";
                         }
                     }
                 }
-                mailbox += "\bcom";
-//                std::cout<<mailbox;
-                printf("\n");
+//                mailbox += "\bcom";
+                std::cout<<"Primary name server:"<<nameserver<<std::endl;
+                std::cout<<"Responsible authority's mailbox:"<<mailbox<<std::endl;
 
                 printf("SerialNumber:");
                 uint64_t snumber = 0;

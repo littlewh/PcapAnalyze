@@ -113,7 +113,7 @@ std::string Utilities::findItemInData(std::string item_start,std::string item_en
  * 分析dns响应报文时的重复工作
  */
 
-uint64_t Utilities::DNSAnswerHeader(uint8_t data[],uint64_t &length, uint64_t payload,std::map<int,std::string > &map_Class) {
+uint64_t Utilities::DNSAnswerHeader(uint8_t data[],uint64_t &length, uint64_t &payload,std::map<int,std::string > &map_Class) {
     printf("Class:");
     uint64_t number = 0;
     for(int i = length;i < length+2;i++){
@@ -123,6 +123,7 @@ uint64_t Utilities::DNSAnswerHeader(uint8_t data[],uint64_t &length, uint64_t pa
     }
     std::cout<<"("<<map_Class[number]<<")"<<std::endl;
     length += 2;
+    payload -= 2;
 
     printf("Time to live:");
     number = 0;
@@ -133,6 +134,7 @@ uint64_t Utilities::DNSAnswerHeader(uint8_t data[],uint64_t &length, uint64_t pa
     }
     std::cout<<"("<<number<<")"<<std::endl;
     length += 4;
+    payload -= 4;
 
     printf("Data Length:");
     uint64_t data_length = 0;
@@ -143,6 +145,18 @@ uint64_t Utilities::DNSAnswerHeader(uint8_t data[],uint64_t &length, uint64_t pa
     }
     std::cout<<"("<<data_length<<")"<<std::endl;
     length += 2;
+    payload -= 2;
 
     return data_length;
+}
+
+/*
+ * 为确定元组的key进行哈希
+ */
+
+uint64_t Utilities::HTTPHashFunction(uint32_t source_ip, uint32_t destination_ip, uint32_t source_port,uint32_t destination_port) {
+    uint64_t ip = source_ip % 163729 + destination_ip % 122777;
+    uint64_t port = source_port % 163729 + destination_port % 690163;
+
+    return (ip+port)%218357;
 }
