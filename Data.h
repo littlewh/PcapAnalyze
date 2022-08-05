@@ -29,11 +29,19 @@ struct session_elements_http{
     uint64_t destination_port;
     std::string method;
     std::string uri;//host+request
+    std::string content_type;
     std::string body;
     std::string edition;
     std::string code;
     std::string reason;
     bool message_type;//0 query   1 answer
+};
+
+struct session_value{
+    uint64_t number_packet;
+    uint64_t number_query;
+    uint64_t number_answer;
+    uint64_t number_bytes;
 };
 
 class Data {
@@ -55,7 +63,7 @@ struct http_status_line{//响应报文的起始行
 };
 class HTTPRequestData:public Data{
 public:
-    void AnalyzeHTTPRequestData();
+    bool AnalyzeHTTPRequestData(uint64_t HTTPHash,std::map<uint64_t,std::deque<session_elements_http>> &HTTP_session);
     http_request_line httpRequestLine;//请求行
     std::string httpHeader;//请求头
     std::string uri;
@@ -64,7 +72,7 @@ private:
 };
 class HTTPRespondData:public Data{
 public:
-    void AnalyzeHTTPRespondData();
+    bool AnalyzeHTTPRespondData(uint64_t HTTPHash,std::map<uint64_t,std::deque<session_elements_http>> &HTTP_session);
     http_status_line httpStatusLine;//状态行
     std::string httpHeader;//请求头
     std::string httpBody;//请求体

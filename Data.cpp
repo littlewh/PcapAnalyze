@@ -6,7 +6,7 @@
 #include "Utilities.h"
 #include <string>
 /*
- * 获取HTTP数据
+ * 获取数据
  */
 bool Data::GetData(char *url, uint64_t offset, uint64_t &used_offset, uint64_t payload) {
     uint8_t data[payload];
@@ -30,9 +30,8 @@ bool Data::GetData(char *url, uint64_t offset, uint64_t &used_offset, uint64_t p
  * 分析http请求报文
  */
 
-void HTTPRequestData::AnalyzeHTTPRequestData() {
+bool HTTPRequestData::AnalyzeHTTPRequestData(uint64_t HTTPHash,std::map<uint64_t,std::deque<session_elements_http>> &HTTP_session) {
     //请求行
-
     std::string::size_type pos_start_line = message_data.find(0x0d0a);//换行
 //    std::cout<<pos_start_line;
     std::string start_line = message_data.substr(0,pos_start_line);
@@ -40,11 +39,60 @@ void HTTPRequestData::AnalyzeHTTPRequestData() {
     std::string::size_type pos_target = start_line.find(0x20);//空格
 //  std::cout<<pos_target;
     httpRequestLine.request_method = start_line.substr(0,pos_target);
-    /*
-     * @TODO:分包合并
-     */
+
     if(httpRequestLine.request_method != "POST" && httpRequestLine.request_method != "GET"){
-        return;
+        if(!HTTP_session.empty()){
+            session_elements_http sessionElementsHttp = HTTP_session[HTTPHash].front();
+            HTTP_session[HTTPHash].pop_front();
+
+            std::string::size_type pos_header = message_data.find("\r\n\r\n");//空行
+//            std::cout<<pos_header<<std::endl;
+            if(pos_header != message_data.npos){
+                httpHeader = message_data.substr(0,pos_header);
+            }
+            else{//报文没有结束
+//              std::cout<<"NO"<<std::endl;
+                httpHeader = message_data.substr(0);
+            }
+//            std::cout<<pos_header;
+//
+//            std::cout<<httpHeader<<std::endl;
+            std::cout<<"接前包"<<std::endl;
+            std::string agent = utilities.findItemInData("User-Agent:","\r\n",httpHeader);
+
+            std::string accept = utilities.findItemInData("Accept:","\r\n",httpHeader);
+
+            std::string Accept_Language = utilities.findItemInData("Accept-Language:","\r\n",httpHeader);
+
+            std::string Accept_Encoding = utilities.findItemInData("Accept-Encoding:","\r\n",httpHeader);
+
+            std::string Accept_Charset = utilities.findItemInData("Accept-Charset:","\r\n",httpHeader);
+
+            std::string Connection = utilities.findItemInData("Connection:","\r\n",httpHeader);
+
+            std::string Content_Length = utilities.findItemInData("Content-Length:","\r\n",httpHeader);
+
+            std::string Content_Type= utilities.findItemInData("Content-Type:",";",httpHeader);
+
+            if(Content_Type != ""){
+                sessionElementsHttp.content_type = Content_Type;
+            }
+
+            if(pos_header != message_data.npos){
+                std::cout<<"请求体:"<<std::endl;
+                httpBody = message_data.substr(pos_header+1);
+                std::cout<<httpBody<<std::endl;
+                if(httpBody != ""){
+                    sessionElementsHttp.body = httpBody;
+                }
+            }
+            else{//报文没有结束
+//                std::cout<<"NO"<<std::endl;
+
+            }
+            HTTP_session[HTTPHash].push_front(sessionElementsHttp);//从队头取的放回队头
+        }
+        return false;
     }
     std::cout<<"请求行:"<<std::endl;
     std::cout<<"Method:"<<httpRequestLine.request_method<<std::endl;
@@ -74,27 +122,25 @@ void HTTPRequestData::AnalyzeHTTPRequestData() {
 //    std::cout<<httpHeader<<std::endl;
 
     std::string host = utilities.findItemInData("Host:","\r\n",httpHeader);
-    std::cout<<host<<std::endl;
+
     uri = host;
     uri += httpRequestLine.request_target;
 
     std::string agent = utilities.findItemInData("User-Agent:","\r\n",httpHeader);
-    std::cout<<agent<<std::endl;
 
     std::string accept = utilities.findItemInData("Accept:","\r\n",httpHeader);
-    std::cout<<accept<<std::endl;
 
     std::string Accept_Language = utilities.findItemInData("Accept-Language:","\r\n",httpHeader);
-    std::cout<<Accept_Language<<std::endl;
 
     std::string Accept_Encoding = utilities.findItemInData("Accept-Encoding:","\r\n",httpHeader);
-    std::cout<<Accept_Encoding<<std::endl;
 
     std::string Accept_Charset = utilities.findItemInData("Accept-Charset:","\r\n",httpHeader);
-    std::cout<<Accept_Charset<<std::endl;
 
     std::string Connection = utilities.findItemInData("Connection:","\r\n",httpHeader);
-    std::cout<<Connection<<std::endl;
+
+    std::string Content_Length = utilities.findItemInData("Content_Length:","\r\n",httpHeader);
+
+    std::string content_type = utilities.findItemInData("Content_Type:","\r\n",httpHeader);
 
 //    std::cout<<httpHeader<<std::endl;
 
@@ -107,13 +153,14 @@ void HTTPRequestData::AnalyzeHTTPRequestData() {
 //        std::cout<<"NO"<<std::endl;
 
     }
+    return true;
 }
 
 /*
  * 分析http响应报文
  */
 
-void HTTPRespondData::AnalyzeHTTPRespondData() {
+bool HTTPRespondData::AnalyzeHTTPRespondData(uint64_t HTTPHash,std::map<uint64_t,std::deque<session_elements_http>> &HTTP_session) {
 //    std::cout<<message_data<<std::endl;
     //响应行
 
@@ -124,11 +171,45 @@ void HTTPRespondData::AnalyzeHTTPRespondData() {
     std::string::size_type pos_target = start_line.find(" ");
 //  std::cout<<pos_target;
     std::string ss_edition = start_line.substr(0,pos_target);
-    /*
-     * @TODO:分包合并
-     */
     if(ss_edition.find("HTTP") == ss_edition.npos){
-        return;
+
+        if(!HTTP_session.empty()){
+            session_elements_http sessionElementsHttp = HTTP_session[HTTPHash].back();
+            HTTP_session[HTTPHash].pop_back();
+
+            std::string::size_type pos_header = message_data.find("\r\n\r\n");//空行
+//            std::cout<<pos_header<<std::endl;
+            if(pos_header != message_data.npos){
+                httpHeader = message_data.substr(pos_start_line+1,pos_header);
+            }
+            else{//报文没有结束
+//              std::cout<<"NO"<<std::endl;
+                httpHeader = message_data.substr(pos_start_line+1);
+            }
+
+            std::string server = utilities.findItemInData("Server:","\r\n",httpHeader);
+
+            std::string date = utilities.findItemInData("Date:","\r\n",httpHeader);
+
+            std::string content_type = utilities.findItemInData("Content-Type:","\r\n",httpHeader);
+            if(content_type != ""){
+                sessionElementsHttp.content_type = content_type;
+            }
+            std::string Accept_Encoding = utilities.findItemInData("Accept-Encoding:","\r\n",httpHeader);
+            if(pos_header != message_data.npos){
+                std::cout<<"响应体"<<std::endl;
+                httpBody = message_data.substr(pos_header+1);
+                std::cout<<httpBody<<std::endl;
+                sessionElementsHttp.body = httpBody;
+            }
+            else{//报文没有结束
+//        std::cout<<"NO"<<std::endl;
+
+            }
+
+            HTTP_session[HTTPHash].push_back(sessionElementsHttp);//从队尾取的放回队尾
+        }
+        return false;
     }
     std::cout<<"响应行:"<<std::endl;
     httpStatusLine.edition = ss_edition;
@@ -142,11 +223,10 @@ void HTTPRespondData::AnalyzeHTTPRespondData() {
     httpStatusLine.reason = start_line.substr(pos_edition+1,pos_start_line-pos_edition-1);
     std::cout<<"Reason:"<<httpStatusLine.reason<<std::endl;
 
-
     //响应头
     std::cout<<"响应头"<<std::endl;
     std::string::size_type pos_header = message_data.find("\r\n\r\n");
-    std::cout<<pos_header<<std::endl;
+//    std::cout<<pos_header<<std::endl;
     if(pos_header != message_data.npos){
         httpHeader = message_data.substr(pos_start_line+1,pos_header);
     }
@@ -159,16 +239,12 @@ void HTTPRespondData::AnalyzeHTTPRespondData() {
 //    std::cout<<httpHeader<<std::endl;
 
     std::string server = utilities.findItemInData("Server:","\r\n",httpHeader);
-    std::cout<<server<<std::endl;
 
     std::string date = utilities.findItemInData("Date:","\r\n",httpHeader);
-    std::cout<<date<<std::endl;
 
     std::string content_type = utilities.findItemInData("Content-Type:","\r\n",httpHeader);
-    std::cout<<content_type<<std::endl;
 
     std::string Accept_Encoding = utilities.findItemInData("Accept-Encoding:","\r\n",httpHeader);
-    std::cout<<Accept_Encoding<<std::endl;
 
 //    std::cout<<httpHeader<<std::endl;
     if(pos_header != message_data.npos){
@@ -181,7 +257,7 @@ void HTTPRespondData::AnalyzeHTTPRespondData() {
 
     }
 
-
+    return true;
 }
 
 /*
@@ -242,7 +318,7 @@ void DNSRespondData::AnalyzeDNSData(char *url, uint64_t offset, uint64_t &used_o
     }
     printf("\n");
 
-    if(DNS_session[TransactionID].empty()){
+    if(DNS_session[TransactionID].empty()){//没有对应的查询报文，无法获取长度
         std::cout<<"Meaningless Message！"<<std::endl;
     }
     else{

@@ -16,8 +16,8 @@ bool DNSHeader::GetDNSHeader(char *url, uint64_t offset, uint64_t &used_offset) 
  * ·ÖÎöDNSÊ×²¿
  */
 
-void DNSHeader::AnalyzeDNSHeader(uint64_t &ipTotalLen) {
-    ipTotalLen -= 12;
+void DNSHeader::AnalyzeDNSHeader(uint64_t &payloadLen) {
+    payloadLen -= 12;
 
     printf("TransactionID:");
     TransactionID = utilities.DisplayArray(2,dnsHeader->TransactionID);

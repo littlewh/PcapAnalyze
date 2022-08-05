@@ -103,7 +103,9 @@ std::string Utilities::findItemInData(std::string item_start,std::string item_en
     std::string::size_type pos_start = data.find(item_start);
     if(pos_start != data.npos){
         std::string::size_type pos_end = data.find(item_end,pos_start+1);
-        return data.substr(pos_start,pos_end-pos_start);
+        std::string ss = data.substr(pos_start,pos_end-pos_start);
+        std::cout<<ss<<std::endl;
+        return ss;
     }
 
     return "";
@@ -151,12 +153,13 @@ uint64_t Utilities::DNSAnswerHeader(uint8_t data[],uint64_t &length, uint64_t &p
 }
 
 /*
- * 为确定元组的key进行哈希
+ * 为确定四元组的key进行哈希,
+ * 源ip|目的ip，源端口|目的端口
  */
 
 uint64_t Utilities::HTTPHashFunction(uint32_t source_ip, uint32_t destination_ip, uint32_t source_port,uint32_t destination_port) {
-    uint64_t ip = source_ip % 163729 + destination_ip % 122777;
-    uint64_t port = source_port % 163729 + destination_port % 690163;
+    uint64_t ip = (source_ip  + destination_ip) % 122777;
+    uint64_t port = (source_port + destination_port) % 690163;
 
     return (ip+port)%218357;
 }
